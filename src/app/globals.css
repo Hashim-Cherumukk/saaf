@@ -1,26 +1,56 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), ui-serif, Georgia, serif;
+  
+  --color-background: var(--bg-color);
+  --color-foreground: var(--text-color);
+  --color-primary: var(--primary-color);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Light Mode: Pure white, Deep black text */
+    --bg-color: #ffffff;
+    --text-color: #0a0a0a;
+    --primary-color: #000000;
+  }
+
+  .dark {
+    /* Ultra-Modern Dark Mode: Deep charcoal/black, Crisp white text */
+    --bg-color: #050505; 
+    --text-color: #FAFAFA;
+    --primary-color: #ffffff;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    transition: background-color 0.4s ease, color 0.4s ease;
+    font-family: var(--font-sans); /* Force Inter globally */
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans); /* Force Inter for headings */
+    letter-spacing: -0.04em; /* Tighter letter spacing for a modern feel */
+    font-weight: 600;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Lenis Smooth Scroll Setup */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
 }
