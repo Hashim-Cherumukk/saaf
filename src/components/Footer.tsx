@@ -1,53 +1,97 @@
 // src/components/Footer.tsx
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-black py-16 text-white transition-colors duration-300 dark:bg-[#001a11] dark:text-[#FFD700]">
-      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 md:grid-cols-4 md:px-12">
-        
-        {/* Brand Info */}
-        <div className="md:col-span-2">
-          <Link href="/" className="mb-6 inline-block font-serif text-2xl font-bold uppercase tracking-widest">
-            Saaf Couture
-          </Link>
-          <p className="mb-6 max-w-sm font-sans text-sm text-gray-400 dark:text-[#FFD700]/70">
-            Elegance in every detail. Premium Qamees and exclusive Perfumes designed for the modern standard.
-          </p>
-          <div className="flex gap-4 font-sans text-sm">
-            <a href="https://instagram.com" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">Instagram</a>
-            <a href="https://wa.me/1234567890" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+    <footer className="w-full bg-black pb-8 pt-16 text-white md:pt-24">
+      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-12 md:gap-8">
+
+          {/* 1. BRAND & LOGO COLUMN */}
+          <div className="md:col-span-4 lg:col-span-5">
+            <Link href="/" className="inline-block">
+              {/* Using the Logo image instead of text.
+                The 'invert' class magically turns a black logo white for this dark footer!
+              */}
+              <Image 
+                src="/logo.jpg" 
+                alt="Saaf Couture" 
+                width={150} 
+                height={60} 
+                className="invert object-contain"
+              />
+            </Link>
+            
+            <p className="mt-6 max-w-sm font-sans text-xs leading-relaxed text-white/60 md:text-sm">
+              Elegance in every detail. Premium Qamees and exclusive Perfumes designed for the modern standard.
+            </p>
+            
+            {/* Added Direct Email Contact */}
+            <div className="mt-6 flex flex-col gap-2 font-sans text-xs font-medium text-white/80">
+              <a href="mailto:info@saafcouture.com" className="transition-colors hover:text-white">
+                info@saafcouture.com
+              </a>
+            </div>
+
+            <div className="mt-6 flex gap-6 font-sans text-[10px] font-bold uppercase tracking-widest text-white">
+              <a href="https://instagram.com" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://wa.me/1234567890" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+            </div>
+          </div>
+
+          {/* 2. SHOP LINKS */}
+          <div className="md:col-span-3 lg:col-span-2">
+            <h3 className="mb-6 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Shop</h3>
+            <ul className="flex flex-col gap-4 font-sans text-xs font-medium text-white/70">
+              <li><Link href="/shop" className="transition-colors hover:text-white">All Products</Link></li>
+              <li><Link href="/shop?category=qamees" className="transition-colors hover:text-white">Qamees Collection</Link></li>
+              <li><Link href="/shop?category=perfumes" className="transition-colors hover:text-white">Perfume Collection</Link></li>
+            </ul>
+          </div>
+
+          {/* 3. SUPPORT LINKS */}
+          <div className="md:col-span-2 lg:col-span-2">
+            <h3 className="mb-6 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Support</h3>
+            <ul className="flex flex-col gap-4 font-sans text-xs font-medium text-white/70">
+              <li><Link href="/contact" className="transition-colors hover:text-white">Contact Us</Link></li>
+              <li><Link href="/faq" className="transition-colors hover:text-white">FAQ & Shipping</Link></li>
+              <li><Link href="/returns" className="transition-colors hover:text-white">Returns</Link></li>
+            </ul>
+          </div>
+
+          {/* 4. NEWSLETTER */}
+          <div className="md:col-span-3 lg:col-span-3">
+            <h3 className="mb-6 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">Newsletter</h3>
+            <p className="mb-6 font-sans text-xs leading-relaxed text-white/70">
+              Subscribe to receive updates, access to exclusive deals, and more.
+            </p>
+            <form className="flex w-full items-end border-b border-white/30 pb-2 transition-colors focus-within:border-white">
+              <input
+                type="email"
+                placeholder="Enter your email address"
+                className="w-full bg-transparent font-sans text-xs text-white placeholder-white/40 outline-none"
+                required
+              />
+              <button type="submit" className="ml-4 pb-1 text-white transition-transform hover:translate-x-1">
+                <ArrowRight size={16} />
+              </button>
+            </form>
+          </div>
+
+        </div>
+
+        {/* BOTTOM COPYRIGHT */}
+        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-white/10 pt-8 font-sans text-[10px] font-medium uppercase tracking-widest text-white/40 md:mt-24 md:flex-row">
+          <p>&copy; {new Date().getFullYear()} Saaf Couture. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="transition-colors hover:text-white">Privacy Policy</Link>
+            <Link href="/terms" className="transition-colors hover:text-white">Terms of Service</Link>
           </div>
         </div>
 
-        {/* Quick Links */}
-        <div>
-          <h3 className="mb-6 font-sans text-sm font-semibold uppercase tracking-wider">Shop</h3>
-          <ul className="space-y-4 font-sans text-sm text-gray-400 dark:text-[#FFD700]/70">
-            <li><Link href="/shop" className="transition-colors hover:text-white dark:hover:text-[#FFD700]">All Products</Link></li>
-            <li><Link href="/shop?category=qamees" className="transition-colors hover:text-white dark:hover:text-[#FFD700]">Qamees Collection</Link></li>
-            <li><Link href="/shop?category=perfumes" className="transition-colors hover:text-white dark:hover:text-[#FFD700]">Perfume Collection</Link></li>
-          </ul>
-        </div>
-
-        {/* Support */}
-        <div>
-          <h3 className="mb-6 font-sans text-sm font-semibold uppercase tracking-wider">Support</h3>
-          <ul className="space-y-4 font-sans text-sm text-gray-400 dark:text-[#FFD700]/70">
-            <li><Link href="/contact" className="transition-colors hover:text-white dark:hover:text-[#FFD700]">Contact Us</Link></li>
-            <li><Link href="/faq" className="transition-colors hover:text-white dark:hover:text-[#FFD700]">FAQ & Shipping</Link></li>
-          </ul>
-        </div>
-
-      </div>
-
-      {/* Bottom Copyright */}
-      <div className="mx-auto mt-16 flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-gray-800 px-6 pt-8 font-sans text-xs text-gray-500 dark:border-[#FFD700]/20 dark:text-[#FFD700]/50 md:flex-row md:px-12">
-        <p>&copy; {new Date().getFullYear()} Saaf Couture. All rights reserved.</p>
-        <div className="flex gap-4">
-          <Link href="/privacy" className="hover:text-white dark:hover:text-[#FFD700]">Privacy Policy</Link>
-          <Link href="/terms" className="hover:text-white dark:hover:text-[#FFD700]">Terms of Service</Link>
-        </div>
       </div>
     </footer>
   );

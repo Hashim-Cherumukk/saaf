@@ -5,10 +5,10 @@ import { useState } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import Image from "next/image";
 import Link from "next/link";
-import { MessageCircle, ArrowLeft, ShieldCheck } from "lucide-react";
+import { MessageCircle, ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react";
 
 export default function CheckoutPage() {
-  const { cart, clearCart } = useCartStore();
+  const { cart } = useCartStore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,140 +25,192 @@ export default function CheckoutPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleWhatsAppOrder = () => {
-    if (!formData.name || !formData.address || !formData.phone) {
-      alert("Please fill in your delivery details.");
+  const handleWhatsAppOrder = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.address || !formData.phone || !formData.city) {
+      alert("Please fill in all required delivery details.");
       return;
     }
 
-    // Construct the WhatsApp Message
-    const orderItems = cart
-      .map((item) => `• ${item.name} (x${item.quantity}) - $${(item.price * (item.quantity || 1)).toFixed(2)}`)
-      .join("\n");
-
-    const message = `*New Order from Saaf Couture*%0A%0A` +
-      `*Customer Details:*%0A` +
-      `Name: ${formData.name}%0A` +
-      `Phone: ${formData.phone}%0A` +
-      `Address: ${formData.address}, ${formData.city}%0A%0A` +
-      `*Order Summary:*%0A${orderItems}%0A%0A` +
-      `*Total Amount:* $${total.toFixed(2)}%0A%0A` +
-      `Please confirm my order and provide payment instructions.`;
-
-    const whatsappNumber = "1234567890"; // Replace with your actual business number
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+    let message = `*NEW ORDER | SAAF COUTURE*%0A%0A`;
     
-    // Optional: Clear cart after redirect
-    // clearCart();
+    message += `*Customer Details:*%0A`;
+    message += `Name: ${formData.name}%0A`;
+    message += `Email: ${formData.email || "Not provided"}%0A`;
+    message += `Phone: ${formData.phone}%0A`;
+    message += `Address: ${formData.address}, ${formData.city}%0A%0A`;
+    
+    message += `*Order Summary:*%0A`;
+    cart.forEach((item, index) => {
+      message += `${index + 1}. *${item.name}*%0A`;
+      message += `   Qty: ${item.quantity} | $${(item.price * (item.quantity || 1)).toFixed(2)}%0A`;
+    });
+    
+    message += `%0A*Subtotal:* $${subtotal.toFixed(2)}%0A`;
+    message += `*Shipping:* ${shipping === 0 ? "Complimentary" : `$${shipping.toFixed(2)}`}%0A`;
+    message += `*Total Amount: $${total.toFixed(2)}*%0A%0A`;
+    
+    message += `Please confirm my order and provide payment instructions.`;
+
+    const whatsappNumber = "9778461263"; 
+    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
   };
 
   if (cart.length === 0) {
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center">
-        <h2 className="font-serif text-2xl">Your bag is empty.</h2>
-        <Link href="/shop" className="mt-4 underline">Return to Shop</Link>
-      </div>
+      <main className="flex min-h-[70vh] w-full flex-col items-center justify-center bg-white px-6">
+        <ShoppingBag size={48} strokeWidth={1} className="mb-6 text-black/20" />
+        <h2 className="font-sans text-lg font-bold uppercase tracking-widest text-black">Your bag is empty</h2>
+        <p className="mt-2 font-sans text-sm font-medium text-black/50">Add items to your bag to proceed to checkout.</p>
+        <Link 
+          href="/shop" 
+          className="mt-8 border-b border-black pb-1 font-sans text-[10px] font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-60"
+        >
+          Return to Shop
+        </Link>
+      </main>
     );
   }
 
   return (
-    <div className="min-h-screen bg-white py-20 transition-colors duration-300 dark:bg-[#013220]">
-      <div className="mx-auto max-w-7xl px-6 md:px-12">
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12">
+    // FIX 1: Reduced massive pt-24/pt-32 gap to a tight pt-6/pt-12
+    <main className="min-h-screen w-full bg-white pb-32 pt-6 md:pt-12">
+      <div className="mx-auto max-w-[1200px] px-6 md:px-12">
+        
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-20">
           
-          {/* Left: Shipping Details */}
-          <div className="lg:col-span-7">
-            <Link href="/shop" className="mb-8 flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest opacity-50 hover:opacity-100">
+          {/* LEFT: Shipping Details Form */}
+          <div className="w-full lg:w-[55%]">
+            <Link 
+              href="/shop" 
+              className="mb-8 hidden md:flex w-fit items-center gap-2 font-sans text-[10px] font-bold uppercase tracking-widest text-black/40 transition-colors hover:text-black"
+            >
               <ArrowLeft size={14} /> Back to Shop
             </Link>
-            <h1 className="font-serif text-3xl font-bold text-black dark:text-[#FFD700]">Delivery Information</h1>
             
-            <div className="mt-10 space-y-6">
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <h1 className="font-sans text-2xl font-black uppercase tracking-tight text-black md:text-4xl">
+              Secure Checkout
+            </h1>
+            <p className="mt-2 font-sans text-[10px] font-medium uppercase tracking-widest text-black/40">
+              Delivery Information
+            </p>
+            
+            <form id="checkout-form" onSubmit={handleWhatsAppOrder} className="mt-10 flex flex-col gap-8">
+              
+              <div className="flex flex-col gap-8 md:flex-row">
+                <div className="flex w-full flex-col gap-2">
+                  <label className="font-sans text-[10px] font-bold uppercase tracking-widest text-black">Full Name *</label>
+                  <input 
+                    type="text" name="name" required
+                    onChange={handleInputChange}
+                    className="border-b border-black/20 bg-transparent py-3 font-sans text-sm text-black outline-none transition-colors focus:border-black" 
+                  />
+                </div>
+                <div className="flex w-full flex-col gap-2">
+                  <label className="font-sans text-[10px] font-bold uppercase tracking-widest text-black">Email Address</label>
+                  <input 
+                    type="email" name="email"
+                    onChange={handleInputChange}
+                    className="border-b border-black/20 bg-transparent py-3 font-sans text-sm text-black outline-none transition-colors focus:border-black" 
+                  />
+                </div>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="font-sans text-[10px] font-bold uppercase tracking-widest text-black">Phone Number (with Country Code) *</label>
                 <input 
-                  type="text" name="name" placeholder="Full Name" 
+                  type="tel" name="phone" required
                   onChange={handleInputChange}
-                  className="w-full border-b border-zinc-200 bg-transparent py-4 outline-none focus:border-black dark:border-[#FFD700]/20 dark:focus:border-[#FFD700]" 
-                />
-                <input 
-                  type="email" name="email" placeholder="Email Address" 
-                  onChange={handleInputChange}
-                  className="w-full border-b border-zinc-200 bg-transparent py-4 outline-none focus:border-black dark:border-[#FFD700]/20 dark:focus:border-[#FFD700]" 
+                  className="border-b border-black/20 bg-transparent py-3 font-sans text-sm text-black outline-none transition-colors focus:border-black" 
                 />
               </div>
-              <input 
-                type="text" name="phone" placeholder="Phone Number (with country code)" 
-                onChange={handleInputChange}
-                className="w-full border-b border-zinc-200 bg-transparent py-4 outline-none focus:border-black dark:border-[#FFD700]/20 dark:focus:border-[#FFD700]" 
-              />
-              <textarea 
-                name="address" placeholder="Shipping Address" rows={3}
-                onChange={handleInputChange}
-                className="w-full border-b border-zinc-200 bg-transparent py-4 outline-none focus:border-black dark:border-[#FFD700]/20 dark:focus:border-[#FFD700]" 
-              />
-              <input 
-                type="text" name="city" placeholder="City / Country" 
-                onChange={handleInputChange}
-                className="w-full border-b border-zinc-200 bg-transparent py-4 outline-none focus:border-black dark:border-[#FFD700]/20 dark:focus:border-[#FFD700]" 
-              />
-            </div>
 
-            <div className="mt-12 flex items-center gap-4 rounded-sm bg-zinc-50 p-6 dark:bg-[#012818]">
-              <ShieldCheck className="text-gray-400" />
-              <p className="text-xs text-gray-500 dark:text-[#FFD700]/60">
-                Your order is processed manually. After clicking the button, a WhatsApp chat will open with your order details for final confirmation and payment.
+              <div className="flex flex-col gap-2">
+                <label className="font-sans text-[10px] font-bold uppercase tracking-widest text-black">Shipping Address *</label>
+                <textarea 
+                  name="address" rows={3} required
+                  onChange={handleInputChange}
+                  className="resize-none border-b border-black/20 bg-transparent py-3 font-sans text-sm text-black outline-none transition-colors focus:border-black" 
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="font-sans text-[10px] font-bold uppercase tracking-widest text-black">City / Country *</label>
+                <input 
+                  type="text" name="city" required
+                  onChange={handleInputChange}
+                  className="border-b border-black/20 bg-transparent py-3 font-sans text-sm text-black outline-none transition-colors focus:border-black" 
+                />
+              </div>
+
+            </form>
+
+            <div className="mt-10 flex items-start gap-4 border border-black/10 bg-gray-50 p-6">
+              <ShieldCheck size={20} className="shrink-0 text-black/40" />
+              <p className="font-sans text-xs font-medium leading-relaxed text-black/60">
+                Your order is processed manually. After clicking the button, a WhatsApp chat will open with your order details for final confirmation and secure payment instructions.
               </p>
             </div>
           </div>
 
-          {/* Right: Order Summary Sidebar */}
-          <div className="lg:col-span-5">
-            <div className="sticky top-32 rounded-sm border border-zinc-100 p-8 dark:border-[#FFD700]/10">
-              <h2 className="mb-8 font-serif text-xl font-bold">Order Summary</h2>
-              <div className="space-y-6">
+          {/* RIGHT: Order Summary Sidebar */}
+          <div className="w-full lg:sticky lg:top-32 lg:w-[45%]">
+            <div className="bg-gray-50 p-6 md:p-8">
+              
+              <h2 className="mb-8 font-sans text-sm font-bold uppercase tracking-widest text-black">
+                Order Summary
+              </h2>
+              
+              <div className="flex flex-col gap-6">
                 {cart.map((item) => (
                   <div key={item.id} className="flex justify-between gap-4">
                     <div className="flex gap-4">
-                      <div className="relative h-20 w-16 flex-shrink-0 bg-zinc-100 dark:bg-[#013220]">
+                      <div className="relative aspect-[3/4] w-16 shrink-0 bg-white">
                         <Image src={item.image} alt={item.name} fill className="object-cover" />
                       </div>
-                      <div>
-                        <p className="text-sm font-bold">{item.name}</p>
-                        <p className="text-xs text-gray-500 uppercase tracking-tighter">Qty: {item.quantity}</p>
+                      <div className="flex flex-col py-1">
+                        <p className="font-sans text-xs font-bold uppercase text-black">{item.name}</p>
+                        <p className="mt-1 font-sans text-[10px] font-bold uppercase tracking-widest text-black/50">Qty: {item.quantity}</p>
                       </div>
                     </div>
-                    <p className="text-sm font-medium">${(item.price * (item.quantity || 1)).toFixed(2)}</p>
+                    <p className="py-1 font-sans text-xs font-medium text-black">
+                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+                    </p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-8 space-y-4 border-t border-zinc-100 pt-8 dark:border-[#FFD700]/10">
-                <div className="flex justify-between text-sm">
+              <div className="mt-8 flex flex-col gap-4 border-t border-black/10 pt-8">
+                <div className="flex justify-between font-sans text-xs font-medium text-black/70">
                   <span>Subtotal</span>
                   <span>${subtotal.toFixed(2)}</span>
                 </div>
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between font-sans text-xs font-medium text-black/70">
                   <span>Shipping</span>
                   <span>{shipping === 0 ? "Complimentary" : `$${shipping.toFixed(2)}`}</span>
                 </div>
-                <div className="flex justify-between border-t border-zinc-100 pt-4 font-serif text-lg font-bold dark:border-[#FFD700]/10">
+                <div className="mt-2 flex justify-between border-t border-black/10 pt-4 font-sans text-sm font-bold uppercase tracking-widest text-black">
                   <span>Total</span>
-                  <span className="text-[#013220] dark:text-[#FFD700]">${total.toFixed(2)}</span>
+                  <span>${total.toFixed(2)}</span>
                 </div>
               </div>
 
+              {/* FIX 2 & 3: Button is permanently green on mobile. On desktop, it's black and turns green on hover. */}
               <button
-                onClick={handleWhatsAppOrder}
-                className="mt-10 flex w-full items-center justify-center gap-3 bg-black py-5 font-sans text-[10px] font-bold uppercase tracking-[0.3em] text-white transition-all hover:bg-[#25D366] active:scale-95 dark:bg-[#FFD700] dark:text-[#013220] dark:hover:bg-white"
+                type="submit"
+                form="checkout-form"
+                className="group mt-10 flex w-full items-center justify-center gap-3 bg-[#25D366] py-5 font-sans text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all active:scale-[0.98] md:bg-black md:hover:bg-[#25D366]"
               >
-                <MessageCircle size={18} />
-                Order via WhatsApp
+                <MessageCircle size={16} className="transition-transform group-hover:scale-110" />
+                Confirm Order on WhatsApp
               </button>
+
             </div>
           </div>
 
         </div>
       </div>
-    </div>
+    </main>
   );
 }

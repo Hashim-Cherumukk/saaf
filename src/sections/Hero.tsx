@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function Hero() {
   return (
-    <section className="relative w-full bg-white overflow-hidden border-b border-black/5">
+    <section id="hero" className="relative w-full bg-white overflow-hidden border-b border-black/5">
       
       {/* 1. BACKGROUND TEXT (Fixed to layout) */}
       <div className="absolute top-[10%] left-[-2%] z-0 select-none pointer-events-none">

@@ -6,25 +6,25 @@ import ProductCard from "@/components/ProductCard";
 import { products } from "@/lib/data";
 
 export default function BestSellers() {
-  // Grab exactly 4 items for a clean row
+  // Grab exactly 4 items
   const bestSellers = [...products].reverse().slice(0, 4);
 
   return (
-    <section className="w-full bg-white py-16 md:py-24 border-b border-black/5">
-      <div className="mx-auto max-w-[1400px] px-6 md:px-12">
+    <section className="w-full bg-white py-16 md:py-24">
+      <div className="mx-auto max-w-[1400px] px-5 md:px-12">
         
-        {/* 1. SIMPLE, ELEGANT HEADER */}
-        <div className="mb-12 flex flex-col items-center text-center md:mb-16">
-          <h2 className="font-sans text-3xl font-bold tracking-tight text-black md:text-4xl">
+        {/* 1. QUIET, STANDARD HEADER */}
+        <div className="mb-10 flex flex-col items-center text-center md:mb-16">
+          <h2 className="font-sans text-2xl font-bold uppercase tracking-widest text-black md:text-3xl">
             Best Sellers
           </h2>
-          <p className="mt-3 max-w-lg font-sans text-sm text-black/60">
-            The most sought-after silhouettes from the Saaf Couture archive.
-          </p>
         </div>
 
-        {/* 2. STANDARD FASHION GRID (Mobile: 2 cols, Desktop: 4 cols) */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6 md:gap-y-12">
+        {/* 2. THE STANDARD RETAIL GRID 
+            Mobile: 2 columns, tight horizontal gap (gap-x-3) so images are large.
+            Desktop: 4 columns, standard gap (gap-x-8).
+        */}
+        <div className="grid grid-cols-2 gap-x-3 gap-y-10 sm:gap-x-6 md:grid-cols-4 md:gap-x-8 md:gap-y-16">
           {bestSellers.map((product) => (
             <div key={product.id}>
               <ProductCard product={product} />
@@ -32,13 +32,13 @@ export default function BestSellers() {
           ))}
         </div>
 
-        {/* 3. BOTTOM BUTTON (Dead center, no distractions) */}
-        <div className="mt-12 flex justify-center md:mt-16">
+        {/* 3. STANDARD BOTTOM BUTTON */}
+        <div className="mt-14 flex justify-center md:mt-20">
           <Link
             href="/shop?sort=bestselling"
-            className="flex items-center justify-center bg-black px-10 py-4 font-sans text-[11px] font-bold uppercase tracking-widest text-white transition-transform active:scale-95 hover:bg-black/80 md:text-xs"
+            className="border border-black px-10 py-4 font-sans text-xs font-semibold uppercase tracking-widest text-black transition-colors hover:bg-black hover:text-white"
           >
-            View All Best Sellers
+            Shop All Best Sellers
           </Link>
         </div>
 
