@@ -1,0 +1,50 @@
+// prisma/schema.prisma
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   
+  name      String?
+  createdAt DateTime @default(now())
+}
+
+model Product {
+  id             String   @id @default(cuid())
+  name           String
+  description    String   @db.Text
+  price          Float
+  compareAtPrice Float?   // Optional field for the crossed-out sale price
+  category       String   
+  image          String   // Main thumbnail
+  gallery        String[] // Array of extra image URLs
+  sizes          String[] 
+  inStock        Boolean  @default(true)
+  isFeatured     Boolean  @default(false)
+  isBestSeller   Boolean  @default(false)
+  isNewArrival   Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model InstaPost {
+  id       String @id @default(cuid())
+  imageUrl String
+  link     String
+}
+
+model Review {
+  id      String @id @default(cuid())
+  name    String
+  rating  Int
+  comment String
+  status  String @default("pending") 
+}
