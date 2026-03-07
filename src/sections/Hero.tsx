@@ -3,83 +3,112 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 export default function Hero() {
   return (
-    <section id="hero" className="relative w-full bg-white overflow-hidden border-b border-black/5">
-      
-      {/* 1. BACKGROUND TEXT (Fixed to layout) */}
-      <div className="absolute top-[10%] left-[-2%] z-0 select-none pointer-events-none">
-        <h2 className="font-sans text-[22vw] font-black leading-none tracking-tighter text-[#f7f7f7] uppercase">
-          Saaf
-        </h2>
+    <section className="relative w-full bg-white md:min-h-[75vh] md:border-b md:border-black/5">
+
+      {/* ========================================= */}
+      {/* 1. MOBILE-ONLY DESIGN (Seamless & Native) */}
+      {/* ========================================= */}
+      <div className="flex min-h-[100dvh] w-full flex-col bg-white md:hidden">
+        
+        {/* FIX 1: Natural Aspect Ratio & Mix-Blend */}
+        {/* 'aspect-[4/3]' ensures the container wraps the image perfectly without leaving dead space. */}
+        {/* 'mix-blend-multiply' makes the gray background of your image vanish perfectly into the white. */}
+        <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] bg-white">
+          <Image
+            src="/hero.png"
+            alt="SAAF Couture"
+            fill
+            priority
+            className="object-cover object-top mix-blend-multiply"
+          />
+        </div>
+{/* Bottom Half: Centered, Minimalist Text */}
+        <div className="flex flex-1 flex-col justify-center px-6 pb-12 text-center z-10 -mt-8 sm:px-10">
+          
+          <div className="flex flex-col items-center">
+            <span className="mb-4 block font-sans text-[9px] font-bold uppercase tracking-[0.5em] text-black/40">
+              Signature Collection
+            </span>
+            
+            <h1 className="font-sans text-[13vw] font-light leading-[1.05] tracking-[0.1em] text-black">
+              SAAF <br /> COUTURE
+            </h1>
+            
+            <p className="mt-5 font-sans text-[11px] font-medium leading-relaxed tracking-widest text-black/50 max-w-[280px]">
+              Perfectly tailored Qamees & premium luxury fragrances.
+            </p>
+          </div>
+
+          {/* Ultra-Premium Boutique Button (Minimalist, lightweight, high-fashion) */}
+          <Link
+            href="/shop"
+            className="group relative mt-10 flex w-full items-center justify-center border border-black/30 bg-transparent py-4 transition-colors hover:border-black active:bg-black active:text-white"
+          >
+            <span className="font-sans text-[10px] font-bold uppercase tracking-[0.3em] text-black group-active:text-white">
+              Shop The Collection
+            </span>
+            {/* Absolute positioning pushes the arrow elegantly to the right edge */}
+            <ArrowRight size={14} strokeWidth={1.5} className="absolute right-6 text-black transition-transform group-active:translate-x-1 group-active:text-white" />
+          </Link>
+
+        </div>
       </div>
 
-      {/* The items-stretch flexbox guarantees the text column grows to match the image height */}
-      <div className="relative mx-auto flex w-full max-w-[1800px] flex-row items-stretch">
+      {/* ========================================= */}
+      {/* 2. DESKTOP-ONLY DESIGN (Refined & Scaled) */}
+      {/* ========================================= */}
+      <div className="mx-auto hidden h-full min-h-[85vh] w-full max-w-[1600px] flex-row items-center bg-white md:flex">
         
-        {/* 2. LEFT CONTENT (Forced Left Side) */}
-        <div className="relative z-20 flex w-[45%] lg:w-[40%] flex-col justify-center pl-6 pr-2 py-8 lg:pl-16 lg:py-16">
-          <div className="space-y-1 lg:space-y-2">
-            <p className="font-sans text-[8px] lg:text-[10px] font-bold uppercase tracking-[0.4em] lg:tracking-[0.6em] text-black">
-              Drop 01 / 2026
-            </p>
-            <h1 className="font-sans text-[6.5vw] lg:text-7xl xl:text-8xl font-black uppercase tracking-tighter text-black leading-[0.9]">
-              Unbound <br />
-              <span className="text-transparent [webkit-text-stroke:1px_black]">Forms</span>
-            </h1>
+        {/* Left Text */}
+        <div className="relative z-20 flex w-1/2 flex-col justify-center px-12 py-12 lg:pl-20 xl:pl-32">
+          
+          {/* Editorial Accent Line & Subtitle */}
+          <div className="mb-8 flex items-center gap-4">
+            <div className="h-[1px] w-4 bg-black" />
+            <span className="font-sans text-[9px] font-bold uppercase tracking-[0.4em] text-black/40">
+              Signature Collection
+            </span>
           </div>
-
-          <div className="mt-4 lg:mt-10 max-w-[180px] lg:max-w-xs space-y-4 lg:space-y-8">
-            <p className="font-sans text-[9px] sm:text-[10px] lg:text-sm font-medium leading-relaxed text-black/60">
-              The intersection of traditional silhouette and brutalist architecture. 
-              Designed for the modern nomad.
-            </p>
-            
-            <div className="flex flex-col gap-4">
-              <Link
-                href="/shop"
-                className="w-fit border-b border-black pb-0.5 lg:border-b-2 lg:py-1 font-sans text-[9px] lg:text-sm font-black uppercase tracking-widest text-black transition-transform hover:translate-x-2"
-              >
-                Shop Collection —
-              </Link>
-            </div>
-          </div>
+          
+          <h1 className="flex flex-col font-sans uppercase text-black">
+            {/* Elegant tracking and light weight for that magazine feel */}
+            <span className="text-6xl font-light leading-[1.05] tracking-[0.15em] lg:text-[80px]">SAAF</span>
+            <span className="text-6xl font-light leading-[1.05] tracking-[0.15em] lg:text-[80px]">COUTURE</span>
+          </h1>
+          
+          <p className="mt-8 max-w-sm font-sans text-xs font-medium leading-relaxed tracking-wide text-black/50 lg:text-sm">
+            Discover our signature collection of perfectly tailored Qamees and premium luxury fragrances. Designed for everyday elegance.
+          </p>
+          
+          {/* Boutique Underline Link */}
+          <Link
+            href="/shop"
+            className="group mt-12 flex w-fit items-center gap-4 border-b border-black/20 pb-2 font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-black transition-all hover:border-black"
+          >
+            Explore Collection
+            <ArrowRight size={14} strokeWidth={1.5} className="text-black/40 transition-transform duration-300 group-hover:translate-x-2 group-hover:text-black" />
+          </Link>
+          
         </div>
 
-        {/* 3. RIGHT IMAGE (Proportional Aspect Ratio Box) */}
-        <div className="relative z-10 flex w-[55%] lg:w-[60%] items-center justify-end pr-4 py-6 lg:pr-12 lg:py-12">
-          
-          {/* THIS is the magic. The aspect ratio forces the height naturally based on the screen width.
-            No more vh calculations. The image will never break or crop awkwardly.
-          */}
-          <div className="relative w-full aspect-[3/4] sm:aspect-square lg:aspect-[16/9] bg-gray-50 overflow-hidden">
+        {/* Right Image - No gap, perfectly hugging the edges */}
+        <div className="relative z-10 flex h-[75vh] w-1/2 items-center justify-center">
+          <div className="relative h-full w-full">
             <Image
               src="/hero.png"
-              alt="SAAF Couture Main"
+              alt="SAAF Couture"
               fill
               priority
-              className="object-cover object-center"
+              // mix-blend-multiply ensures it blends beautifully into the white desktop background too
+              className="object-cover object-center mix-blend-multiply"
             />
-            
-            {/* Minimalist Overlay Label */}
-            <div className="absolute bottom-4 left-4 lg:bottom-10 lg:left-10 overflow-hidden">
-               <div className="bg-white/95 px-3 py-1.5 lg:px-4 lg:py-2 text-[7px] lg:text-[10px] font-bold uppercase tracking-[0.3em] text-black">
-                 Articulated Seams
-               </div>
-            </div>
           </div>
         </div>
 
-      </div>
-
-      {/* 4. VERTICAL NAVIGATION/STATS */}
-      <div className="absolute right-4 lg:right-6 top-1/2 hidden -translate-y-1/2 flex-col items-center gap-8 lg:gap-12 md:flex">
-        <div className="h-16 lg:h-24 w-[1px] bg-black/10" />
-        <p className="rotate-90 font-sans text-[8px] lg:text-[9px] font-black uppercase tracking-[0.5em] text-black/30 whitespace-nowrap">
-          SC — GLOBAL ATELIER
-        </p>
-        <div className="h-16 lg:h-24 w-[1px] bg-black/10" />
       </div>
 
     </section>
