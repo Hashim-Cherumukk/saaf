@@ -1,17 +1,22 @@
-// src/sections/InstagramGallery.tsx
 import Image from "next/image";
 import Link from "next/link";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import { Instagram } from "lucide-react"; // <-- We added the Instagram icon!
 
-// Using fresh, reliable Unsplash IDs that won't 404
-const lifestyleImages = [
-  { id: 1, src: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=600&auto=format&fit=crop", alt: "Saaf Couture Editorial" },
-  { id: 2, src: "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=600&auto=format&fit=crop", alt: "Saaf Couture Lifestyle" },
-  { id: 3, src: "https://images.unsplash.com/photo-1485230405346-71acb9518d9c?q=80&w=600&auto=format&fit=crop", alt: "Saaf Couture Detail" },
-  { id: 4, src: "https://images.unsplash.com/photo-1550614000-4b95f1711200?q=80&w=600&auto=format&fit=crop", alt: "Saaf Couture Archive" },
-  { id: 5, src: "https://images.unsplash.com/photo-1532453288672-3a27e9be9efd?q=80&w=600&auto=format&fit=crop", alt: "Saaf Couture Campaign" },
-];
+// Secure Database Connection
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
-export default function InstagramGallery() {
+export default async function InstagramGallery() {
+  // Fetch the 10 newest gallery posts directly from Neon
+  const posts = await (prisma as any).instaPost.findMany({
+    orderBy: { createdAt: 'desc' },
+    take: 10 // <-- Increased to 10!
+  });
+
   return (
     <section className="w-full bg-white py-16 md:py-24 border-b border-black/5">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
@@ -26,33 +31,59 @@ export default function InstagramGallery() {
           </p>
         </div>
 
-        {/* 2. TEASER GRID (Mobile: 2 cols, Desktop: 5 cols) */}
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
-          {lifestyleImages.map((image, index) => (
-            <div 
-              key={image.id} 
-              className={`group relative aspect-[4/5] w-full overflow-hidden bg-gray-50 
-                ${index === 4 ? "hidden md:block" : ""}
-              }`}
-            >
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                sizes="(max-width: 768px) 50vw, 20vw"
-                className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
-              />
-            </div>
-          ))}
-        </div>
+        {/* 2. DYNAMIC 10-GRID */}
+        {posts.length === 0 ? (
+          <div className="flex h-48 w-full items-center justify-center border border-dashed border-black/10 bg-gray-50">
+            <p className="font-sans text-xs font-bold uppercase tracking-widest text-black/40">
+              Gallery Coming Soon
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-4">
+            {posts.map((post: any) => {
+              const gridClasses = "group relative aspect-[4/5] w-full overflow-hidden bg-gray-50";
 
-        {/* 3. BOTTOM BUTTON FUNNELING TO FULL PAGE */}
+              const ImageContent = (
+                <>
+                  <Image
+                    src={post.imageUrl}
+                    alt="Saaf Couture Lifestyle"
+                    fill
+                    sizes="(max-width: 768px) 50vw, 20vw"
+                    className="object-cover object-center transition-transform duration-700 group-hover:scale-105"
+                  />
+                  {/* Subtle overlay effect on hover */}
+                  <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
+                  
+                  {/* NEW: On-hover Instagram Icon for realism */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                    <Instagram size={32} className="text-white drop-shadow-md" strokeWidth={1.5} />
+                  </div>
+                </>
+              );
+
+              return post.link ? (
+                <Link key={post.id} href={post.link} target="_blank" className={gridClasses}>
+                  {ImageContent}
+                </Link>
+              ) : (
+                <div key={post.id} className={gridClasses}>
+                  {ImageContent}
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* 3. AUTHENTIC INSTAGRAM BUTTON */}
         <div className="mt-12 flex justify-center md:mt-16">
           <Link
-            href="/community"
-            className="flex items-center justify-center border border-black px-10 py-4 font-sans text-xs font-semibold uppercase tracking-widest text-black transition-colors hover:bg-black hover:text-white"
+            href="https://instagram.com/your-profile" // Update this with your real Instagram URL!
+            target="_blank"
+            className="group flex items-center justify-center gap-3 border border-black px-10 py-4 font-sans text-xs font-semibold uppercase tracking-widest text-black transition-all hover:bg-black hover:text-white"
           >
-            Explore Full Archive
+            <Instagram size={18} className="transition-transform group-hover:scale-110" />
+            Follow on Instagram
           </Link>
         </div>
 

@@ -1,4 +1,3 @@
-// src/components/Navbar.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -23,6 +22,7 @@ export default function Navbar() {
   const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
+  // Live Zustand Subscriptions
   const cart = useCartStore((state) => state.cart);
   const wishlist = useWishlistStore((state) => state.wishlist);
   const totalItems = cart.reduce((acc, item) => acc + (item.quantity || 1), 0);
@@ -55,48 +55,42 @@ export default function Navbar() {
             </button>
           </div>
 
-          {/* Desktop Logo */}
+          {/* Desktop Logo */}  
           <div className="hidden flex-1 items-center justify-start md:flex">
             <Link
               href="/"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             >
-              {mounted && (
-                <Image
-                  src="/logo.jpg"
-                  alt="Saaf Couture"
-                  width={280}
-                  height={160}
-                  className={`transition-all duration-500 ${
+              <Image
+                src="/logo.jpg"
+                alt="Saaf Couture"
+                width={280}
+                height={160}
+                className={`transition-all duration-500 ${
                   isScrolled ? "h-[45px]" : "h-[60px]"
-                  } w-auto object-contain`}
-                  priority
-                />
-              )}
-           </Link>
+                } w-auto object-contain`}
+                priority // This now works instantly because it's not waiting for 'mounted'
+              />
+            </Link>
           </div>
 
           {/* Center */}
           <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center">
-
-            {/* Mobile Logo */}
-            <Link
-              href="/"
-              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="md:hidden"
-            >
-              {mounted && (
-                <Image
-                  src="/logo.jpg"
-                  alt="Saaf Couture"
-                  width={150}
-                  height={80}
-                  className="h-10 w-auto object-contain"
-                  priority
-                />
-              )}
-            </Link>
-
+          {/* Mobile Logo */}
+          <Link
+            href="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="md:hidden"
+          >
+            <Image
+              src="/logo.jpg"
+              alt="Saaf Couture"
+              width={150}
+              height={80}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </Link>
             {/* Desktop Links */}
             <div className="hidden md:flex gap-12">
               <Link
@@ -186,7 +180,8 @@ export default function Navbar() {
               className="relative hidden md:block hover:scale-110 transition"
             >
               <Heart size={20} strokeWidth={1.5} />
-
+              
+              {/* LIVE WISHLIST INDICATOR */}
               {mounted && wishlist.length > 0 && (
                 <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500" />
               )}
@@ -195,16 +190,16 @@ export default function Navbar() {
             {/* Cart */}
             <button
               onClick={() => setIsCartOpen(true)}
-              className="relative flex items-center rounded-full bg-black px-3 py-2 text-white md:px-5"
+              className="relative flex items-center rounded-full bg-black px-3 py-2 text-white md:px-5 hover:bg-black/80 transition-colors"
             >
               <ShoppingBag size={18} strokeWidth={2} />
 
-              {/* Mobile Dot */}
+              {/* Mobile Cart Dot */}
               {mounted && totalItems > 0 && (
                 <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-red-500 md:hidden" />
               )}
 
-              {/* Desktop Count */}
+              {/* Desktop Cart Count */}
               <span className="hidden md:block ml-2 text-[12px] font-semibold">
                 {mounted ? totalItems : 0}
               </span>

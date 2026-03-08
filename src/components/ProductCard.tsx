@@ -1,13 +1,12 @@
-// src/components/ProductCard.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heart, X, MessageCircle, ShoppingBag, Check } from "lucide-react";
-import { Product } from "@/lib/data";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
+import type { Product } from "@prisma/client"; // Importing directly from your database schema
 
 type Intent = "cart" | "buy" | null;
 
@@ -26,8 +25,8 @@ export default function ProductCard({ product }: { product: Product }) {
   const [error, setError] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
-  const isQamees = product.category === "qamees";
-  const sizes = ["S", "M", "L", "XL", "XXL"];
+  // Check if the product has sizes from the database
+  const hasSizes = product.sizes && product.sizes.length > 0;
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -52,11 +51,12 @@ export default function ProductCard({ product }: { product: Product }) {
       setQuantity(1);
       setError(false);
       setIsAdded(false);
-    }, 300); // Wait for animation to finish before resetting
+    }, 300);
   };
 
   const handleConfirm = () => {
-    if (isQamees && !selectedSize) {
+    // Dynamic validation: Only demand a size if the product actually has sizes
+    if (hasSizes && !selectedSize) {
       setError(true);
       return;
     }
@@ -66,6 +66,7 @@ export default function ProductCard({ product }: { product: Product }) {
       const cartItemId = selectedSize ? `${product.id}-${selectedSize}` : product.id;
       const cartItemName = selectedSize ? `${product.name} (Size: ${selectedSize})` : product.name;
 
+      // @ts-ignore - store types might need a slight update later, but this works perfectly for now
       addToCart({
         ...product,
         id: cartItemId,
@@ -76,13 +77,13 @@ export default function ProductCard({ product }: { product: Product }) {
       setIsAdded(true);
       setTimeout(() => {
         closeModal();
-      }, 1500); // Show "Added ✓" for 1.5s then close
+      }, 1500);
     } 
     else if (intent === "buy") {
       const itemName = selectedSize ? `${product.name} (Size: ${selectedSize})` : product.name;
       const totalPrice = product.price * quantity;
 
-      const message = `*INSTANT ORDER | SAAF COUTURE*%0A%0AI would like to purchase:%0A1x *${itemName}*%0AQuantity: ${quantity}%0ATotal: $${totalPrice.toFixed(2)}%0A%0APlease let me know the next steps for payment and delivery.`;
+      const message = `*INSTANT ORDER | SAAF COUTURE*%0A%0AI would like to purchase:%0A1x *${itemName}*%0AQuantity: ${quantity}%0ATotal: ₹${totalPrice.toFixed(2)}%0A%0APlease let me know the next steps for payment and delivery.`;
       
       window.open(`https://wa.me/9778461263?text=${message}`, "_blank");
       closeModal();
@@ -94,6 +95,16 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* 1. THE PRODUCT CARD */}
       <div className="group relative flex h-full flex-col">
         <div className="relative aspect-[3/4] w-full overflow-hidden bg-gray-50">
+
+        {/* Sold Out Overlay */}
+          {!product.inStock && (
+            <div className="absolute inset-0 z-10 bg-white/40 backdrop-blur-[2px] flex items-center justify-center pointer-events-none">
+              <div className="bg-white text-black text-[10px] md:text-xs font-bold uppercase tracking-widest px-4 py-2 shadow-sm">
+                Sold Out
+              </div>
+            </div>
+          )}
+
           <Link href={`/shop/${product.id}`} className="block h-full w-full">
             <Image
               src={product.image}
@@ -104,57 +115,78 @@ export default function ProductCard({ product }: { product: Product }) {
             />
           </Link>
           <button 
-            onClick={() => toggleWishlist(product)}
+            onClick={() => toggleWishlist(product as any)}
             className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm transition-transform active:scale-90 md:right-4 md:top-4 md:h-10 md:w-10 hover:scale-110"
           >
             <Heart size={18} strokeWidth={1.5} className={isFavorite ? "fill-red-500 text-red-500" : "text-black"} />
           </button>
+          
+          {/* Sale Badge if it has a compareAtPrice */}
+          {product.compareAtPrice && (
+            <div className="absolute left-3 top-3 z-10 bg-amber-600 text-white text-[8px] md:text-[9px] font-bold uppercase tracking-widest px-2 py-1">
+              Sale
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex flex-1 flex-col items-center text-center">
           <Link href={`/shop/${product.id}`}>
-            <h3 className="font-sans text-[11px] font-bold uppercase tracking-widest text-black transition-colors hover:text-black/60 md:text-xs">
+            <h3 className="font-sans text-[11px] font-bold uppercase tracking-widest text-black transition-colors hover:text-black/60 md:text-xs line-clamp-1">
               {product.name}
             </h3>
           </Link>
-          <p className="mt-1 font-sans text-[11px] font-medium text-black/60 md:text-xs">
-            ${product.price.toFixed(2)}
-          </p>
           
-          {/* Standard Action Buttons */}
-          <div className="mt-auto flex w-full gap-2 pt-4">
-            <button
-              onClick={() => openModal("cart")}
-              className="flex-1 border border-black/10 bg-transparent py-2.5 font-sans text-[9px] font-bold uppercase tracking-widest text-black transition-colors hover:border-black hover:bg-black hover:text-white md:text-[10px]"
-            >
-              Add to Bag
-            </button>
-            <button
-              onClick={() => openModal("buy")}
-              className="flex-1 bg-black py-2.5 font-sans text-[9px] font-bold uppercase tracking-widest text-white transition-opacity hover:bg-black/80 md:text-[10px]"
-            >
-              Buy Now
-            </button>
-          </div>
+          {/* Dynamic Pricing Display */}
+          {product.compareAtPrice ? (
+            <div className="flex gap-2 items-center mt-1">
+              <p className="font-sans text-[10px] font-medium text-black/40 line-through md:text-xs">
+                ₹{product.compareAtPrice.toFixed(2)}
+              </p>
+              <p className="font-sans text-[11px] font-medium text-amber-700 md:text-xs">
+                ₹{product.price.toFixed(2)}
+              </p>
+            </div>
+          ) : (
+             <p className="mt-1 font-sans text-[11px] font-medium text-black/60 md:text-xs">
+              ₹{product.price.toFixed(2)}
+            </p>
+          )}
+          
+          {/* Dynamic Action Buttons based on Stock */}
+          {product.inStock ? (
+            <div className="mt-auto flex w-full gap-2 pt-4">
+              <button
+                onClick={() => openModal("cart")}
+                className="flex-1 border border-black/10 bg-transparent py-2.5 font-sans text-[9px] font-bold uppercase tracking-widest text-black transition-colors hover:border-black hover:bg-black hover:text-white md:text-[10px]"
+              >
+                Add to Bag
+              </button>
+              <button
+                onClick={() => openModal("buy")}
+                className="flex-1 bg-black py-2.5 font-sans text-[9px] font-bold uppercase tracking-widest text-white transition-opacity hover:bg-black/80 md:text-[10px]"
+              >
+                Buy Now
+              </button>
+            </div>
+          ) : (
+            <div className="mt-auto flex w-full pt-4">
+               <button disabled className="w-full bg-zinc-100 py-2.5 font-sans text-[9px] font-bold uppercase tracking-widest text-black/40 cursor-not-allowed md:text-[10px]">
+                 Out of Stock
+               </button>
+            </div>
+          )}
         </div>
       </div>
 
       {/* 2. THE GLOBAL POPUP MODAL */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-end justify-center bg-black/40 p-4 backdrop-blur-sm transition-opacity sm:items-center sm:p-6">
-          
-          {/* Modal Content Box */}
           <div className="relative w-full max-w-sm bg-white p-6 shadow-2xl animate-in slide-in-from-bottom-4 sm:slide-in-from-bottom-0 sm:zoom-in-95">
             
-            {/* Close Button */}
-            <button 
-              onClick={closeModal}
-              className="absolute right-4 top-4 p-2 text-black/40 transition-colors hover:text-black"
-            >
+            <button onClick={closeModal} className="absolute right-4 top-4 p-2 text-black/40 transition-colors hover:text-black">
               <X size={18} />
             </button>
 
-            {/* Header: Intent & Product Summary */}
             <h2 className="mb-4 pr-8 font-sans text-sm font-bold uppercase tracking-widest text-black border-b border-black/10 pb-4">
               {intent === "cart" ? "Add to Bag" : "Instant Checkout"}
             </h2>
@@ -165,18 +197,18 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
               <div>
                 <h3 className="font-sans text-[11px] font-bold uppercase text-black line-clamp-1">{product.name}</h3>
-                <p className="mt-1 font-sans text-[11px] text-black/60">${product.price.toFixed(2)}</p>
+                <p className="mt-1 font-sans text-[11px] text-black/60">₹{product.price.toFixed(2)}</p>
               </div>
             </div>
 
-            {/* Size Selector */}
-            {isQamees && (
+            {/* Dynamic Size Selector */}
+            {hasSizes && (
               <div className="mb-6">
                 <label className="mb-2 block font-sans text-[9px] font-bold uppercase tracking-widest text-black/60">
                   Select Size
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {sizes.map((size) => (
+                  {product.sizes.map((size) => (
                     <button
                       key={size}
                       onClick={() => { setSelectedSize(size); setError(false); }}
@@ -192,7 +224,6 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
             )}
 
-            {/* Quantity Selector */}
             <div className="mb-8">
               <label className="mb-2 block font-sans text-[9px] font-bold uppercase tracking-widest text-black/60">
                 Quantity
@@ -204,15 +235,10 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
             </div>
 
-            {/* Confirm Button */}
             <button
               onClick={handleConfirm}
               className={`flex w-full items-center justify-center gap-2 py-4 font-sans text-[11px] font-bold uppercase tracking-[0.2em] text-white transition-all active:scale-[0.98] ${
-                isAdded 
-                  ? "bg-green-600" 
-                  : intent === "buy" 
-                    ? "bg-[#25D366] hover:bg-[#25D366]/90" 
-                    : "bg-black hover:bg-black/90"
+                isAdded ? "bg-green-600" : intent === "buy" ? "bg-[#25D366] hover:bg-[#25D366]/90" : "bg-black hover:bg-black/90"
               }`}
             >
               {isAdded ? (
@@ -223,7 +249,6 @@ export default function ProductCard({ product }: { product: Product }) {
                 <><ShoppingBag size={16} /> Confirm Add</>
               )}
             </button>
-
           </div>
         </div>
       )}

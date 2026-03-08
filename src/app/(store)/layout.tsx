@@ -2,10 +2,12 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SmoothScroll from "@/components/SmoothScroll";
+import AnnouncementBar from "@/components/AnnouncementBar"; 
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <SmoothScroll>
+      <AnnouncementBar />
       <Navbar />
       <div className="flex-grow">{children}</div>
       <Footer />

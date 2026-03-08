@@ -1,7 +1,6 @@
-// src/app/checkout/page.tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCartStore } from "@/store/useCartStore";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,6 +8,10 @@ import { MessageCircle, ArrowLeft, ShieldCheck, ShoppingBag } from "lucide-react
 
 export default function CheckoutPage() {
   const { cart } = useCartStore();
+  
+  // Hydration state check to prevent Next.js crashes
+  const [isMounted, setIsMounted] = useState(false);
+  
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,8 +20,13 @@ export default function CheckoutPage() {
     city: "",
   });
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   const subtotal = cart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
-  const shipping = subtotal > 500 ? 0 : 25;
+  // Updated free shipping threshold to ₹5000
+  const shipping = subtotal > 5000 ? 0 : 250; 
   const total = subtotal + shipping;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -33,29 +41,32 @@ export default function CheckoutPage() {
       return;
     }
 
-    let message = `*NEW ORDER | SAAF COUTURE*%0A%0A`;
+    // Using standard \n because we use encodeURIComponent below!
+    let message = `*NEW ORDER | SAAF COUTURE*\n\n`;
     
-    message += `*Customer Details:*%0A`;
-    message += `Name: ${formData.name}%0A`;
-    message += `Email: ${formData.email || "Not provided"}%0A`;
-    message += `Phone: ${formData.phone}%0A`;
-    message += `Address: ${formData.address}, ${formData.city}%0A%0A`;
+    message += `*Customer Details:*\n`;
+    message += `Name: ${formData.name}\n`;
+    message += `Email: ${formData.email || "Not provided"}\n`;
+    message += `Phone: ${formData.phone}\n`;
+    message += `Address: ${formData.address}, ${formData.city}\n\n`;
     
-    message += `*Order Summary:*%0A`;
+    message += `*Order Summary:*\n`;
     cart.forEach((item, index) => {
-      message += `${index + 1}. *${item.name}*%0A`;
-      message += `   Qty: ${item.quantity} | $${(item.price * (item.quantity || 1)).toFixed(2)}%0A`;
+      message += `${index + 1}. *${item.name}*\n`;
+      message += `   Qty: ${item.quantity} | ₹${(item.price * (item.quantity || 1)).toFixed(2)}\n`;
     });
     
-    message += `%0A*Subtotal:* $${subtotal.toFixed(2)}%0A`;
-    message += `*Shipping:* ${shipping === 0 ? "Complimentary" : `$${shipping.toFixed(2)}`}%0A`;
-    message += `*Total Amount: $${total.toFixed(2)}*%0A%0A`;
+    message += `\n*Subtotal:* ₹${subtotal.toFixed(2)}\n`;
+    message += `*Shipping:* ${shipping === 0 ? "Complimentary" : `₹${shipping.toFixed(2)}`}\n`;
+    message += `*Total Amount: ₹${total.toFixed(2)}*\n\n`;
     
     message += `Please confirm my order and provide payment instructions.`;
 
     const whatsappNumber = "9778461263"; 
-    window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+    window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
+
+  if (!isMounted) return null;
 
   if (cart.length === 0) {
     return (
@@ -74,7 +85,6 @@ export default function CheckoutPage() {
   }
 
   return (
-    // FIX 1: Reduced massive pt-24/pt-32 gap to a tight pt-6/pt-12
     <main className="min-h-screen w-full bg-white pb-32 pt-6 md:pt-12">
       <div className="mx-auto max-w-[1200px] px-6 md:px-12">
         
@@ -170,12 +180,12 @@ export default function CheckoutPage() {
                         <Image src={item.image} alt={item.name} fill className="object-cover" />
                       </div>
                       <div className="flex flex-col py-1">
-                        <p className="font-sans text-xs font-bold uppercase text-black">{item.name}</p>
+                        <p className="font-sans text-xs font-bold uppercase text-black line-clamp-2">{item.name}</p>
                         <p className="mt-1 font-sans text-[10px] font-bold uppercase tracking-widest text-black/50">Qty: {item.quantity}</p>
                       </div>
                     </div>
                     <p className="py-1 font-sans text-xs font-medium text-black">
-                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+                      ₹{(item.price * (item.quantity || 1)).toFixed(2)}
                     </p>
                   </div>
                 ))}
@@ -184,19 +194,18 @@ export default function CheckoutPage() {
               <div className="mt-8 flex flex-col gap-4 border-t border-black/10 pt-8">
                 <div className="flex justify-between font-sans text-xs font-medium text-black/70">
                   <span>Subtotal</span>
-                  <span>${subtotal.toFixed(2)}</span>
+                  <span>₹{subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between font-sans text-xs font-medium text-black/70">
                   <span>Shipping</span>
-                  <span>{shipping === 0 ? "Complimentary" : `$${shipping.toFixed(2)}`}</span>
+                  <span>{shipping === 0 ? "Complimentary" : `₹${shipping.toFixed(2)}`}</span>
                 </div>
                 <div className="mt-2 flex justify-between border-t border-black/10 pt-4 font-sans text-sm font-bold uppercase tracking-widest text-black">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
               </div>
 
-              {/* FIX 2 & 3: Button is permanently green on mobile. On desktop, it's black and turns green on hover. */}
               <button
                 type="submit"
                 form="checkout-form"

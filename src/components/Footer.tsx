@@ -1,3 +1,5 @@
+"use client";
+
 // src/components/Footer.tsx
 import Link from "next/link";
 import Image from "next/image";
@@ -16,19 +18,19 @@ export default function Footer() {
               {/* Using the Logo image instead of text.
                 The 'invert' class magically turns a black logo white for this dark footer!
               */}
-              <Image 
-                src="/logo.jpg" 
-                alt="Saaf Couture" 
-                width={150} 
-                height={60} 
+              <Image
+                src="/logo.jpg"
+                alt="Saaf Couture"
+                width={150}
+                height={60}
                 className="invert object-contain"
               />
             </Link>
-            
+
             <p className="mt-6 max-w-sm font-sans text-xs leading-relaxed text-white/60 md:text-sm">
               Elegance in every detail. Premium Qamees and exclusive Perfumes designed for the modern standard.
             </p>
-            
+
             {/* Added Direct Email Contact */}
             <div className="mt-6 flex flex-col gap-2 font-sans text-xs font-medium text-white/80">
               <a href="mailto:info@saafcouture.com" className="transition-colors hover:text-white">
@@ -68,15 +70,35 @@ export default function Footer() {
             <p className="mb-6 font-sans text-xs leading-relaxed text-white/70">
               Subscribe to receive updates, access to exclusive deals, and more.
             </p>
-            <form className="flex w-full items-end border-b border-white/30 pb-2 transition-colors focus-within:border-white">
+            <form 
+              action={async (formData) => {
+                const { subscribeToNewsletter } = await import("@/app/actions/newsletter");
+                const result = await subscribeToNewsletter(formData);
+                if (result.success) {
+                  alert("Welcome to the inner circle. You're subscribed!");
+                } else {
+                  alert(result.error);
+                }
+              }}
+              className="relative flex w-full items-center border-b border-white/30 pb-2 transition-colors focus-within:border-white"
+            >
               <input
                 type="email"
+                name="email"
                 placeholder="Enter your email address"
-                className="w-full bg-transparent font-sans text-xs text-white placeholder-white/40 outline-none"
+                className="w-full bg-transparent font-sans text-xs text-white placeholder-white/40 outline-none pr-16"
                 required
               />
-              <button type="submit" className="ml-4 pb-1 text-white transition-transform hover:translate-x-1">
-                <ArrowRight size={16} />
+  
+              {/* Refined 'Join' Button */}
+              <button 
+                type="submit" 
+                className="absolute right-0 flex items-center gap-2 group"
+              >
+                <span className="font-sans text-[10px] font-bold uppercase tracking-widest text-white/60 group-hover:text-white transition-colors">
+                  Join
+                </span>
+                <ArrowRight size={14} className="text-white/60 group-hover:text-white group-hover:translate-x-1 transition-all" />
               </button>
             </form>
           </div>

@@ -35,16 +35,37 @@ model Product {
   updatedAt      DateTime @updatedAt
 }
 
+// --- UPGRADED MODELS FOR STOREFRONT CONTROL ---
+
 model InstaPost {
-  id       String @id @default(cuid())
-  imageUrl String
-  link     String
+  id        String   @id @default(cuid())
+  imageUrl  String
+  link      String?  // Optional link if you want them to click to Instagram
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 model Review {
-  id      String @id @default(cuid())
-  name    String
-  rating  Int
-  comment String
-  status  String @default("pending") 
+  id          String   @id @default(cuid())
+  name        String
+  productName String   // e.g., "Signature Oud Blend"
+  rating      Int      @default(5)
+  comment     String   @db.Text
+  isPublished Boolean  @default(true) // Allows Admin to approve/hide reviews
+  createdAt   DateTime @default(now())
+}
+
+// Single-row table to control global website settings
+model StoreSettings {
+  id               String   @id @default("saaf-settings") 
+  announcementText String   @default("Complimentary Global Shipping on Orders over ₹5000")
+  isAnnouncementOn Boolean  @default(true) // Toggle the top black bar on/off
+  freeShippingGoal Float    @default(5000) // Controls the cart math dynamically
+  updatedAt        DateTime @updatedAt
+}
+
+model Newsletter {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
 }

@@ -4,10 +4,14 @@ import { useState } from "react";
 import { CldUploadWidget } from "next-cloudinary";
 import { updateProduct, deleteProduct } from "../../actions";
 import Link from "next/link";
+import SubmitButton from "@/components/SubmitButton";
 
 export default function EditForm({ product }: { product: any }) {
-  // Pre-load the existing image URL from the database
-  const [imageUrl, setImageUrl] = useState<string>(product.image);
+  // Pull the main image AND the gallery array from Neon to populate the grid
+  const [images, setImages] = useState<string[]>([
+    product.image,
+    ...(product.gallery || [])
+  ]);
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-zinc-900 font-sans p-6 md:p-12">
@@ -20,9 +24,7 @@ export default function EditForm({ product }: { product: any }) {
           <h1 className="text-3xl font-serif">Edit: {product.name}</h1>
         </div>
 
-        {/* Update Form */}
         <form action={updateProduct} className="bg-white border border-zinc-200/60 rounded-xl p-8 shadow-sm space-y-8 mb-8">
-          {/* Hidden input so the Server Action knows exactly which row to update */}
           <input type="hidden" name="id" value={product.id} />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -39,8 +41,8 @@ export default function EditForm({ product }: { product: any }) {
                   <input required type="number" step="0.01" name="price" defaultValue={product.price} className="w-full border-b border-zinc-200 pb-2 text-sm focus:outline-none focus:border-black transition-colors" />
                 </div>
                 <div className="flex-1">
-                  <label className="block text-[10px] uppercase tracking-widest text-amber-600 mb-2">Sale Price (₹)</label>
-                  <input type="number" step="0.01" name="compareAtPrice" defaultValue={product.compareAtPrice || ''} className="w-full border-b border-zinc-200 pb-2 text-sm focus:outline-none focus:border-amber-600 transition-colors" placeholder="Optional crossed-out price" />
+                  <label className="block text-[10px] uppercase tracking-widest text-amber-600 mb-2">Original Price (₹)</label>
+                  <input type="number" step="0.01" name="compareAtPrice" defaultValue={product.compareAtPrice || ''} className="w-full border-b border-zinc-200 pb-2 text-sm focus:outline-none focus:border-amber-600 transition-colors" placeholder="For sales" />
                 </div>
               </div>
 
@@ -49,7 +51,7 @@ export default function EditForm({ product }: { product: any }) {
                 <select name="category" defaultValue={product.category} className="w-full border-b border-zinc-200 pb-2 text-sm focus:outline-none focus:border-black transition-colors bg-white">
                   <option value="clothing">Clothing</option>
                   <option value="perfumes">Perfumes</option>
-                  <option value="accessories">Accessories</option>
+                  <option value="others">Others</option>
                 </select>
               </div>
 
@@ -63,17 +65,18 @@ export default function EditForm({ product }: { product: any }) {
                  <h3 className="text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Storefront Visibility</h3>
                  
                  <label className="flex items-center gap-3 text-sm cursor-pointer">
-                   <input type="checkbox" name="inStock" defaultChecked={product.inStock} className="accent-black w-4 h-4" />
+                   {/* Explicitly added value="on" to ensure HTML sends it correctly */}
+                   <input type="checkbox" name="inStock" value="on" defaultChecked={product.inStock} className="accent-black w-4 h-4" />
                    Product is In Stock
                  </label>
 
                  <label className="flex items-center gap-3 text-sm cursor-pointer">
-                   <input type="checkbox" name="isBestSeller" defaultChecked={product.isBestSeller} className="accent-black w-4 h-4" />
+                   <input type="checkbox" name="isBestSeller" value="on" defaultChecked={product.isBestSeller} className="accent-black w-4 h-4" />
                    Flag as "Best Seller"
                  </label>
 
                  <label className="flex items-center gap-3 text-sm cursor-pointer">
-                   <input type="checkbox" name="isFeatured" defaultChecked={product.isFeatured} className="accent-black w-4 h-4" />
+                   <input type="checkbox" name="isFeatured" value="on" defaultChecked={product.isFeatured} className="accent-black w-4 h-4" />
                    Show in Featured Section
                  </label>
               </div>
@@ -92,25 +95,53 @@ export default function EditForm({ product }: { product: any }) {
               </div>
             </div>
 
-            {/* Cloudinary Image Updater */}
+            {/* Right Column: Multi-Image Cloudinary Upload */}
             <div>
-              <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Main Product Image</label>
-              <input type="hidden" name="image" value={imageUrl} required />
+              <div className="flex justify-between items-end mb-2">
+                 <label className="block text-[10px] uppercase tracking-widest text-zinc-500">Product Images</label>
+                 <span className="text-[9px] text-zinc-400">First image is the main cover</span>
+              </div>
+              
+              <input type="hidden" name="image" value={images[0] || ""} required />
+              {images.slice(1).map((img, i) => (
+                <input key={i} type="hidden" name="gallery" value={img} />
+              ))}
 
               <CldUploadWidget 
                 uploadPreset="saaf_images" 
-                onSuccess={(result: any) => setImageUrl(result.info.secure_url)}
+                options={{ multiple: true }}
+                onSuccess={(result: any) => setImages((prev) => [...prev, result.info.secure_url])}
               >
                 {({ open }) => (
-                  <div 
-                    onClick={() => open()}
-                    className="border border-zinc-200 hover:border-black transition-colors rounded-xl h-80 flex flex-col items-center justify-center cursor-pointer bg-zinc-50/50 group overflow-hidden relative"
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={imageUrl} alt={product.name} className="h-full w-full object-cover" />
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <span className="text-white text-xs tracking-widest uppercase">Change Photo</span>
+                  <div className="space-y-4">
+                    <div 
+                      onClick={() => open()}
+                      className="border-2 border-dashed border-zinc-200 hover:border-black transition-colors rounded-xl h-32 flex flex-col items-center justify-center cursor-pointer bg-zinc-50/50 group"
+                    >
+                      <span className="text-xl mb-1 text-zinc-300 group-hover:text-black transition-colors">+</span>
+                      <span className="text-[10px] uppercase tracking-widest text-zinc-400 group-hover:text-black transition-colors">Add More Photos</span>
                     </div>
+
+                    {images.length > 0 && (
+                      <div className="grid grid-cols-2 gap-3">
+                        {images.map((img, idx) => (
+                          <div key={idx} className="relative aspect-[3/4] rounded-lg overflow-hidden group border border-zinc-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={img} alt="Uploaded" className="h-full w-full object-cover" />
+                            {idx === 0 && (
+                               <div className="absolute top-2 left-2 bg-black text-white text-[8px] uppercase tracking-widest px-2 py-1 rounded-sm">Cover</div>
+                            )}
+                            <button 
+                               type="button"
+                               onClick={() => setImages(images.filter((_, i) => i !== idx))}
+                               className="absolute top-2 right-2 bg-white/90 text-red-500 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </CldUploadWidget>
@@ -118,13 +149,10 @@ export default function EditForm({ product }: { product: any }) {
           </div>
 
           <div className="pt-6 border-t border-zinc-100 flex justify-end">
-            <button type="submit" className="bg-black text-white px-10 py-3 text-[10px] uppercase tracking-[0.2em] hover:bg-zinc-800 transition-all">
-              Save Changes
-            </button>
+            <SubmitButton label="Save Changes" />
           </div>
         </form>
 
-        {/* Danger Zone: Separate form for deletion so we don't accidentally mix data */}
         <div className="border border-red-200 bg-red-50/30 rounded-xl p-8 flex justify-between items-center">
             <div>
                 <h3 className="text-sm font-medium text-red-900 mb-1">Danger Zone</h3>
@@ -132,9 +160,7 @@ export default function EditForm({ product }: { product: any }) {
             </div>
             <form action={deleteProduct}>
                 <input type="hidden" name="id" value={product.id} />
-                <button type="submit" className="border border-red-200 text-red-600 px-6 py-2 text-[10px] uppercase tracking-widest hover:bg-red-50 transition-colors">
-                    Delete Product
-                </button>
+                <SubmitButton label="Delete Product" loadingLabel="Deleting..." isDanger={true} />
             </form>
         </div>
 

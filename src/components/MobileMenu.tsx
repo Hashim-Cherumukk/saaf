@@ -67,11 +67,9 @@ export default function MobileMenu({
           </Link>
 
           {/* Wishlist */}
-          <button
-            onClick={() => {
-              onClose();
-              onOpenWishlist();
-            }}
+          <Link
+            href="/wishlist"
+            onClick={onClose}
             className="flex items-center justify-between border-b border-black/5 px-6 py-5 font-sans text-sm font-semibold uppercase tracking-widest text-black hover:bg-gray-50"
           >
             <span className="flex items-center gap-2">
@@ -79,7 +77,7 @@ export default function MobileMenu({
               Wishlist
             </span>
             <ChevronRight size={16} className="opacity-40" />
-          </button>
+          </Link>
 
           {/* About */}
           <Link

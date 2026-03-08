@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { X, Minus, Plus, ShoppingBag, MessageCircle } from "lucide-react";
@@ -13,25 +13,35 @@ interface CartSidebarProps {
 
 export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { cart, removeFromCart, updateQuantity } = useCartStore();
+  
+  // FIX 1: Hydration state to prevent Next.js server/client mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   /* LOCK BACKGROUND SCROLL */
-useEffect(() => {
-  if (isOpen) {
-    document.body.style.overflow = "hidden";
-    document.documentElement.style.overflow = "hidden";
-    document.body.style.touchAction = "none";
-  } else {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    document.body.style.touchAction = "";
-  }
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
 
-  return () => {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    document.body.style.touchAction = "";
-  };
-}, [isOpen]);
+    return () => {
+      document.body.style.overflow = "";
+      document.documentElement.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [isOpen]);
+
+  // If the component hasn't mounted in the browser yet, don't render the cart contents
+  if (!isMounted) return null;
 
   const totalPrice = cart.reduce(
     (total, item) => total + item.price * (item.quantity || 1),
@@ -41,20 +51,19 @@ useEffect(() => {
   const handleWhatsAppCheckout = () => {
     const phoneNumber = "9778461263";
 
-    let message = `*NEW ORDER | SAAF COUTURE*\n\n`;
+    // FIX 3: Using %0A for perfectly formatted WhatsApp line breaks
+    let message = `*NEW ORDER | SAAF COUTURE*%0A%0A`;
 
     cart.forEach((item, index) => {
-      message += `${index + 1}. *${item.name}*\n`;
-      message += `Qty: ${item.quantity}\n`;
-      message += `Price: $${(item.price * (item.quantity || 1)).toFixed(2)}\n\n`;
+      message += `${index + 1}. *${item.name}*%0A`;
+      message += `Qty: ${item.quantity}%0A`;
+      // FIX 2: Updated to ₹
+      message += `Price: ₹${(item.price * (item.quantity || 1)).toFixed(2)}%0A%0A`;
     });
 
-    message += `*TOTAL: $${totalPrice.toFixed(2)}*\n\nPlease confirm my order.`;
+    message += `*TOTAL: ₹${totalPrice.toFixed(2)}*%0A%0APlease confirm my order.`;
 
-    window.open(
-      `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`,
-      "_blank"
-    );
+    window.open(`https://wa.me/${phoneNumber}?text=${message}`, "_blank");
   };
 
   return (
@@ -100,11 +109,10 @@ useEffect(() => {
 
         {/* SCROLLABLE AREA */}
         <div
-  className="flex-1 min-h-0 overflow-y-auto px-8 py-10 overscroll-contain"
-  onWheel={(e) => e.stopPropagation()}
-  onTouchMove={(e) => e.stopPropagation()}
->
-
+          className="flex-1 min-h-0 overflow-y-auto px-8 py-10 overscroll-contain"
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
+        >
           {cart.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <ShoppingBag size={40} strokeWidth={1} className="text-black/10 mb-6"/>
@@ -113,17 +121,16 @@ useEffect(() => {
                 Your bag is empty
               </p>
 
-              <button
+              <Link
+                href="/shop"
                 onClick={onClose}
-                className="mt-6 border-b border-black pb-1 text-[10px] font-bold uppercase tracking-widest"
+                className="mt-6 border-b border-black pb-1 text-[10px] font-bold uppercase tracking-widest hover:text-black/60 transition-colors"
               >
                 Shop Collection
-              </button>
+              </Link>
             </div>
           ) : (
-
             <div className="flex flex-col gap-10">
-
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-6">
 
@@ -139,22 +146,19 @@ useEffect(() => {
 
                   {/* PRODUCT INFO */}
                   <div className="flex flex-1 flex-col justify-between">
-
                     <div>
-                      <h3 className="text-[11px] font-bold uppercase tracking-wider">
+                      <h3 className="text-[11px] font-bold uppercase tracking-wider line-clamp-2">
                         {item.name}
                       </h3>
 
                       <p className="mt-1 text-[11px] text-black/40">
-                        ${item.price.toFixed(2)}
+                        ₹{item.price.toFixed(2)}
                       </p>
                     </div>
 
                     <div className="mt-4 flex items-end justify-between">
-
                       {/* QTY */}
                       <div className="flex h-9 w-24 items-center justify-between border border-black/10 px-2">
-
                         <button
                           onClick={() =>
                             updateQuantity(
@@ -162,6 +166,7 @@ useEffect(() => {
                               Math.max(1, (item.quantity || 1) - 1)
                             )
                           }
+                          className="p-1 hover:text-black/60"
                         >
                           <Minus size={12} />
                         </button>
@@ -174,6 +179,7 @@ useEffect(() => {
                           onClick={() =>
                             updateQuantity(item.id, (item.quantity || 1) + 1)
                           }
+                          className="p-1 hover:text-black/60"
                         >
                           <Plus size={12} />
                         </button>
@@ -181,7 +187,7 @@ useEffect(() => {
 
                       <button
                         onClick={() => removeFromCart(item.id)}
-                        className="text-[9px] uppercase tracking-widest text-black/30 hover:text-red-500"
+                        className="text-[9px] uppercase tracking-widest text-black/30 hover:text-red-500 transition-colors"
                       >
                         Remove
                       </button>
@@ -189,7 +195,6 @@ useEffect(() => {
                   </div>
                 </div>
               ))}
-
             </div>
           )}
         </div>
@@ -197,41 +202,37 @@ useEffect(() => {
         {/* FOOTER */}
         {cart.length > 0 && (
           <div className="shrink-0 border-t border-black/5 bg-white p-8">
-
             <div className="mb-8 flex items-center justify-between">
               <span className="text-[11px] uppercase tracking-[0.2em] text-black/40">
                 Subtotal
               </span>
 
               <span className="text-sm font-bold">
-                ${totalPrice.toFixed(2)}
+                ₹{totalPrice.toFixed(2)}
               </span>
             </div>
 
             <div className="flex flex-col gap-3">
-
               <Link
                 href="/checkout"
                 onClick={onClose}
-                className="flex items-center justify-center bg-black py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white hover:bg-black/90"
+                className="flex items-center justify-center bg-black py-4 text-[10px] font-bold uppercase tracking-[0.2em] text-white transition-opacity hover:bg-black/90"
               >
                 Checkout
               </Link>
 
               <button
                 onClick={handleWhatsAppCheckout}
-                className="flex items-center justify-center gap-2 border border-black/10 py-4 text-[10px] font-bold uppercase tracking-[0.2em]"
+                className="flex items-center justify-center gap-2 border border-black/10 py-4 text-[10px] font-bold uppercase tracking-[0.2em] transition-colors hover:bg-zinc-50"
               >
                 <MessageCircle size={14} />
                 WhatsApp Order
               </button>
-
             </div>
 
             <p className="mt-6 text-center text-[9px] tracking-widest text-black/30">
               SHIPPING & TAXES CALCULATED AT CHECKOUT
             </p>
-
           </div>
         )}
       </aside>
