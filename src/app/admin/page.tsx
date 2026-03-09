@@ -1,15 +1,9 @@
 import { auth, signOut } from "@/auth";
 import { redirect } from "next/navigation";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
 import { LogOut, Image as ImageIcon, Megaphone, Star } from "lucide-react"; // IDE Refresh
-
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 export default async function AdminDashboard() {
   const session = await auth();

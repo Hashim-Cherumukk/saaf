@@ -1,15 +1,13 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function getLiveSearchResults(query: string) {
   if (!query || query.trim().length === 0) return [];
-  
+
   // Split the search into individual words so order doesn't matter
   const searchWords = query.trim().split(" ");
-  
+
   // Look for products that match EVERY word in either the name, description, or category
   const conditions = searchWords.map(word => ({
     OR: [

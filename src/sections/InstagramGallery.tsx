@@ -1,14 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-import { Instagram } from "lucide-react"; // <-- We added the Instagram icon!
-
-// Secure Database Connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+import prisma from "@/lib/prisma";
+import { Instagram } from "lucide-react";
 
 export default async function InstagramGallery() {
   // Fetch the 10 newest gallery posts directly from Neon
@@ -20,7 +13,7 @@ export default async function InstagramGallery() {
   return (
     <section className="w-full bg-white py-16 md:py-24 border-b border-black/5">
       <div className="mx-auto max-w-[1400px] px-6 md:px-12">
-        
+
         {/* 1. HEADER */}
         <div className="mb-10 flex flex-col items-center text-center md:mb-12">
           <h2 className="font-sans text-2xl font-bold uppercase tracking-widest text-black md:text-3xl">
@@ -54,7 +47,7 @@ export default async function InstagramGallery() {
                   />
                   {/* Subtle overlay effect on hover */}
                   <div className="absolute inset-0 bg-black/0 transition-colors duration-500 group-hover:bg-black/20" />
-                  
+
                   {/* NEW: On-hover Instagram Icon for realism */}
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-500 group-hover:opacity-100">
                     <Instagram size={32} className="text-white drop-shadow-md" strokeWidth={1.5} />

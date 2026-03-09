@@ -85,7 +85,7 @@ export default function EditForm({ product }: { product: any }) {
               <div>
                  <label className="block text-[10px] uppercase tracking-widest text-zinc-500 mb-2">Available Sizes</label>
                  <div className="flex gap-3">
-                   {['S', 'M', 'L', 'XL'].map(size => (
+                   {['54', '56', '58'].map(size => (
                      <label key={size} className="flex items-center gap-2 text-sm cursor-pointer">
                        <input type="checkbox" name="sizes" value={size} defaultChecked={product.sizes.includes(size)} className="accent-black" />
                        {size}

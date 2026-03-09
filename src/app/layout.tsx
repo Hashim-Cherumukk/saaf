@@ -17,8 +17,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <link rel="preload" as="image" href="/hero.png" />
+      </head>
+
       <body className={`${inter.variable} ${playfair.variable} font-sans antialiased flex flex-col min-h-screen`}>
-        {/* Only global essentials here */}
         <Providers>
           {children}
         </Providers>

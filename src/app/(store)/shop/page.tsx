@@ -1,14 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import prisma from "@/lib/prisma";
 import ShopClient from "@/app/(store)/shop/ShopClient";
 
 export const dynamic = "force-dynamic";
-
-// Secure Database Connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 export default async function ShopPage() {
   // Fetch ALL products from the database, newest first

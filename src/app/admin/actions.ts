@@ -1,15 +1,8 @@
 "use server";
 
-import { PrismaClient } from "@prisma/client"; // IDE refresh
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-
-// Secure Database Connection
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
 
 export async function createProduct(formData: FormData) {
   // 1. Extract the data from the form
@@ -146,8 +139,8 @@ export async function addInstaPost(formData: FormData) {
 
   // Using 'as any' to bypass the stubborn VS Code cache!
   await (prisma as any).instaPost.create({
-    data: { 
-      imageUrl, 
+    data: {
+      imageUrl,
       link: link || "", // Fallback to empty string for safety
     },
   });
@@ -157,9 +150,9 @@ export async function addInstaPost(formData: FormData) {
 
 export async function deleteInstaPost(formData: FormData) {
   const id = formData.get("id") as string;
-  
-  await (prisma as any).instaPost.delete({ 
-    where: { id } 
+
+  await (prisma as any).instaPost.delete({
+    where: { id }
   });
 
   revalidatePath("/", "layout");
@@ -179,9 +172,9 @@ export async function toggleReviewPublish(formData: FormData) {
 
 export async function deleteReview(formData: FormData) {
   const id = formData.get("id") as string;
-  
-  await (prisma as any).review.delete({ 
-    where: { id } 
+
+  await (prisma as any).review.delete({
+    where: { id }
   });
 
   revalidatePath("/", "layout");
