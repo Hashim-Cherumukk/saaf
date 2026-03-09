@@ -1,12 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { useSearchParams } from "next/navigation"; // 1. IMPORT THIS
+import { useSearchParams, useRouter } from "next/navigation";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@prisma/client";
 
+
 export default function ShopClient({ products }: { products: Product[] }) {
   const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const handleFilterClick = (filter: "all" | "clothing" | "perfumes" | "others") => {
+    setActiveFilter(filter);
+    
+    // If they were stuck in a search, this clears the URL so filters work normally again!
+    if (searchParams.get("search")) {
+      router.replace('/shop', { scroll: false }); 
+    }
+  };
   // 2. GET THE SEARCH WORD FROM THE URL
   const searchQuery = searchParams.get("search")?.toLowerCase() || ""; 
 
@@ -50,7 +61,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
               
               <button
                 type="button"
-                onClick={() => { setActiveFilter("all"); /* Optional: clear search on click */ }}
+                onClick={() => handleFilterClick("all")}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
                   activeFilter === "all" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}
@@ -61,7 +72,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
               <button
                 type="button"
-                onClick={() => setActiveFilter("clothing")}
+                onClick={() => handleFilterClick("clothing")}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
                   activeFilter === "clothing" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}
@@ -74,7 +85,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
               <button
                 type="button"
-                onClick={() => setActiveFilter("perfumes")}
+                onClick={() => handleFilterClick("perfumes")}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
                   activeFilter === "perfumes" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}
@@ -87,7 +98,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
               
               <button
                 type="button"
-                onClick={() => setActiveFilter("others")}
+                onClick={() => handleFilterClick("others")}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
                   activeFilter === "others" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}

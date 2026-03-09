@@ -11,6 +11,7 @@ import CartSidebar from "./CartSidebar";
 import WishlistSidebar from "./WishlistSidebar";
 import MobileMenu from "./MobileMenu";
 import MegaMenu from "./MegaMenu";
+import { getLiveSearchResults } from "@/app/actions/search";
 
 export default function Navbar() {
   const router = useRouter(); // 2. INITIALIZE ROUTER
@@ -25,8 +26,28 @@ export default function Navbar() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   
   // 3. ADD SEARCH STATE
-  const [searchQuery, setSearchQuery] = useState("");
+  
+const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
 
+  // This Effect runs every time the user types a letter
+  useEffect(() => {
+    const fetchResults = async () => {
+      if (searchQuery.trim().length < 2) {
+        setSearchResults([]);
+        return;
+      }
+      setIsSearching(true);
+      const results = await getLiveSearchResults(searchQuery);
+      setSearchResults(results);
+      setIsSearching(false);
+    };
+
+    // Wait 300ms after they stop typing before searching (Performance optimization)
+    const delayDebounceFn = setTimeout(fetchResults, 300);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
   // Live Zustand Subscriptions
   const cart = useCartStore((state) => state.cart);
   const wishlist = useWishlistStore((state) => state.wishlist);
@@ -152,10 +173,8 @@ export default function Navbar() {
 
           {/* Right Icons */}
           <div className="flex flex-1 items-center justify-end gap-3 md:gap-6">
-
-            {/* Desktop Search */}
+{/* Desktop Search */}
             <div className="relative hidden md:flex items-center">
-              {/* 5. ADD FORM WRAPPER FOR DESKTOP */}
               <form onSubmit={handleSearchSubmit}>
                 <input
                   type="text"
@@ -163,8 +182,8 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
                   className={`transition-all duration-300 ease-out ${
-                    desktopSearchOpen ? "w-56 opacity-100 px-4 pr-10" : "w-0 opacity-0 px-0"
-                  } h-9 rounded-full border border-black/10 outline-none text-sm bg-white`}
+                    desktopSearchOpen ? "w-64 opacity-100 px-4 pr-10" : "w-0 opacity-0 px-0"
+                  } h-9 rounded-full border border-black/10 outline-none text-sm bg-white focus:border-black`}
                 />
               </form>
 
@@ -175,13 +194,14 @@ export default function Navbar() {
                   className="ml-2 hover:scale-110 transition"
                 >
                   <Search size={20} strokeWidth={1.5} />
-                  </button>
+                </button>
               ) : (
                 <button
                   type="button"
                   onClick={() => {
                     setDesktopSearchOpen(false);
                     setSearchQuery("");
+                    setSearchResults([]);
                   }}
                   className="absolute right-2 hover:scale-110 transition"
                 >
@@ -189,6 +209,31 @@ export default function Navbar() {
                  </button>
               )}
 
+              {/* THE NEW LIVE DROPDOWN MENU */}
+              {desktopSearchOpen && searchQuery.trim().length >= 2 && (
+                <div className="absolute top-12 right-0 w-80 bg-white border border-black/10 shadow-2xl overflow-hidden z-50 flex flex-col">
+                  {isSearching ? (
+                     <div className="p-6 text-xs text-center font-sans tracking-widest uppercase text-black/40">Searching...</div>
+                  ) : searchResults.length > 0 ? (
+                     searchResults.map((p) => (
+                        <Link 
+                          href={`/shop/${p.id}`} 
+                          key={p.id}
+                          onClick={() => { setDesktopSearchOpen(false); setSearchQuery(""); }}
+                          className="flex items-center justify-between p-4 hover:bg-black/5 transition-colors border-b border-black/5 last:border-0"
+                        >
+                           <div className="flex flex-col">
+                             <span className="text-xs font-bold uppercase tracking-wider text-black">{p.name}</span>
+                             <span className="text-[10px] text-black/50 uppercase">{p.category}</span>
+                           </div>
+                           <span className="text-xs font-medium text-black">₹{p.price}</span>
+                        </Link>
+                     ))
+                  ) : (
+                     <div className="p-6 text-xs text-center font-sans tracking-widest uppercase text-black/40">No Results Found</div>
+                  )}
+                </div>
+              )}
             </div>
             {/* Mobile Search */}
             <button
@@ -232,12 +277,10 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
+{/* Mobile Search Bar */}
         {mobileSearchOpen && (
-          <div className="md:hidden border-t bg-white px-4 py-3 animate-[fadeIn_.2s_ease]">
+          <div className="md:hidden border-t bg-white px-4 py-3 animate-[fadeIn_.2s_ease] absolute w-full left-0 shadow-lg z-50">
             <div className="flex items-center gap-3">
-
-              {/* 6. ADD FORM WRAPPER FOR MOBILE */}
               <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2 rounded-full bg-gray-100 px-3 py-2">
                 <Search size={18} />
                 <input
@@ -246,7 +289,7 @@ export default function Navbar() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Describe what you're looking for..."
                   className="flex-1 bg-transparent outline-none text-sm"
-                  autoFocus // Automatically focus input when mobile search opens
+                  autoFocus 
                 />
               </form>
 
@@ -254,13 +297,39 @@ export default function Navbar() {
                 onClick={() => {
                   setMobileSearchOpen(false);
                   setSearchQuery("");
+                  setSearchResults([]);
                 }}
                 className="text-sm font-medium"
               >
                 Cancel
               </button>
-
             </div>
+
+            {/* LIVE RESULTS FOR MOBILE */}
+            {searchQuery.trim().length >= 2 && (
+              <div className="mt-3 bg-white border border-black/10 rounded-lg overflow-hidden max-h-[60vh] overflow-y-auto">
+                {isSearching ? (
+                   <div className="p-4 text-xs text-center font-sans tracking-widest uppercase text-black/40">Searching...</div>
+                ) : searchResults.length > 0 ? (
+                   searchResults.map((p) => (
+                      <Link 
+                        href={`/shop/${p.id}`} 
+                        key={p.id}
+                        onClick={() => { setMobileSearchOpen(false); setSearchQuery(""); }}
+                        className="flex items-center justify-between p-4 hover:bg-black/5 transition-colors border-b border-black/5 last:border-0"
+                      >
+                         <div className="flex flex-col">
+                           <span className="text-xs font-bold uppercase tracking-wider text-black">{p.name}</span>
+                           <span className="text-[10px] text-black/50 uppercase">{p.category}</span>
+                         </div>
+                         <span className="text-xs font-medium text-black">₹{p.price}</span>
+                      </Link>
+                   ))
+                ) : (
+                   <div className="p-4 text-xs text-center font-sans tracking-widest uppercase text-black/40">No Results Found</div>
+                )}
+              </div>
+            )}
           </div>
         )}
       </nav>
