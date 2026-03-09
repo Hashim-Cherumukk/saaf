@@ -83,9 +83,9 @@ export default function ProductCard({ product }: { product: Product }) {
       const itemName = selectedSize ? `${product.name} (Size: ${selectedSize})` : product.name;
       const totalPrice = product.price * quantity;
 
-      const message = `*INSTANT ORDER | SAAF COUTURE*%0A%0AI would like to purchase:%0A1x *${itemName}*%0AQuantity: ${quantity}%0ATotal: ₹${totalPrice.toFixed(2)}%0A%0APlease let me know the next steps for payment and delivery.`;
+      const message = `*NEW ORDER | SAAF COUTURE*%0A%0AI would like to purchase:%0A1x *${itemName}*%0AQuantity: ${quantity}%0ATotal: ₹${totalPrice.toFixed(2)}%0A%0APlease let me know the next steps for payment and delivery.`;
       
-      window.open(`https://wa.me/9778461263?text=${message}`, "_blank");
+      window.open(`https://wa.me/+916235114104?text=${message}`, "_blank");
       closeModal();
     }
   };

@@ -4,6 +4,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { heroFont } from "@/lib/fonts";
 
 export default function Hero() {
   return (
@@ -13,7 +14,7 @@ export default function Hero() {
       {/* 1. MOBILE-ONLY DESIGN */}
       {/* ========================================= */}
       {/* FIX: Changed 100dvh to 100svh so the screen doesn't resize when the mobile URL bar hides! */}
-      <div className="flex min-h-[100svh] w-full flex-col bg-white md:hidden">
+      <div className="flex min-h-[90svh] w-full flex-col bg-white md:hidden">
         
         <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] bg-white">
           <Image
@@ -32,8 +33,13 @@ export default function Hero() {
               Signature Collection
             </span>
             
-            <h1 className="font-sans text-[13vw] font-light leading-[1.05] tracking-[0.1em] text-black">
-              SAAF <br /> COUTURE
+            <h1 className={`flex flex-col text-black ${heroFont.className}`}>
+              <span className="text-6xl lg:text-[90px] leading-[0.9]">
+                Saaf
+              </span>
+              <span className="text-6xl lg:text-[90px] leading-[0.9] italic">
+                Couture
+              </span>
             </h1>
             
             <p className="mt-5 font-sans text-[11px] font-medium leading-relaxed tracking-widest text-black/50 max-w-[280px]">
@@ -68,9 +74,13 @@ export default function Hero() {
             </span>
           </div>
           
-          <h1 className="flex flex-col font-sans uppercase text-black">
-            <span className="text-6xl font-light leading-[1.05] tracking-[0.15em] lg:text-[80px]">SAAF</span>
-            <span className="text-6xl font-light leading-[1.05] tracking-[0.15em] lg:text-[80px]">COUTURE</span>
+          <h1 className={`flex flex-col text-black ${heroFont.className}`}>
+            <span className="text-6xl lg:text-[90px] leading-[0.9]">
+              Saaf
+            </span>
+            <span className="text-6xl lg:text-[90px] leading-[0.9] italic">
+              Couture
+            </span>
           </h1>
           
           <p className="mt-8 max-w-sm font-sans text-xs font-medium leading-relaxed tracking-wide text-black/50 lg:text-sm">

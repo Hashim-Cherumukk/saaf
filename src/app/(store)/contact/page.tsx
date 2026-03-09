@@ -30,11 +30,28 @@ export default function ContactPage() {
               <h2 className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-black/40">
                 Customer Care
               </h2>
-              <a href="mailto:info@saafcouture.com" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
-                info@saafcouture.com
+              <a href="mailto:hayamperfume@gmail.com" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
+                hayamperfume@gmail.com
               </a>
-              <a href="https://wa.me/1234567890" target="_blank" rel="noopener noreferrer" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
-                +1 (234) 567-890 (WhatsApp)
+              <a href="https://wa.me/+916235114104" target="_blank" rel="noopener noreferrer" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
+                +91 6235114104 (WhatsApp)
+              </a>
+            </div>
+
+            {/* Atelier Location */}
+            <div className="flex flex-col gap-2">
+              <h2 className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-black/40">
+                Atelier Location
+              </h2>
+              <a 
+                href="https://maps.google.com/?q=Kozhikode,+Kerala" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="font-sans text-sm font-medium text-black leading-relaxed hover:underline underline-offset-4"
+              >
+                Saaf Couture<br />
+                Vengara Oorakam,oppo. Malabar college of advanced studies<br />
+                Malappuram Kerala 676304
               </a>
             </div>
 
@@ -45,7 +62,7 @@ export default function ContactPage() {
               </h2>
               <p className="font-sans text-sm font-medium text-black">
                 Monday – Friday <br />
-                9:00 AM – 6:00 PM (EST)
+                9:00 AM – 6:00 PM (IST)
               </p>
             </div>
 
@@ -54,8 +71,8 @@ export default function ContactPage() {
               <h2 className="font-sans text-[10px] font-bold uppercase tracking-[0.2em] text-black/40">
                 Social
               </h2>
-              <a href="https://instagram.com/saafcouture" target="_blank" rel="noopener noreferrer" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
-                Instagram (@SaafCouture)
+              <a href="https://www.instagram.com/saaf.couture/" target="_blank" rel="noopener noreferrer" className="font-sans text-sm font-medium text-black hover:underline underline-offset-4">
+                Instagram (@Saaf.Couture)
               </a>
             </div>
 

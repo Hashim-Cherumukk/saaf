@@ -62,7 +62,7 @@ export default function CheckoutPage() {
     
     message += `Please confirm my order and provide payment instructions.`;
 
-    const whatsappNumber = "9778461263"; 
+    const whatsappNumber = "+916235114104"; 
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
   };
 

@@ -33,14 +33,27 @@ export default function Footer() {
 
             {/* Added Direct Email Contact */}
             <div className="mt-6 flex flex-col gap-2 font-sans text-xs font-medium text-white/80">
-              <a href="mailto:info@saafcouture.com" className="transition-colors hover:text-white">
-                info@saafcouture.com
+              <a href="mailto:hayamperfume@gmail.com" className="transition-colors hover:text-white">
+                hayamperfume@gmail.com
               </a>
             </div>
+            {/* Added Address */}
+<div className="mt-4 font-sans text-xs leading-relaxed text-white/60 transition-colors hover:text-white/80">
+  <a 
+    href="https://maps.google.com/?q=YOUR_URL_ENCODED_ADDRESS" 
+    target="_blank" 
+    rel="noopener noreferrer"
+    className="block"
+  >
+    <p>Saaf Couture</p>
+    <p>Vengara Oorakam,oppo. Malabar college of advanced studies</p>
+    <p>Malappuram Kerala 676304</p> 
+  </a>
+</div>
 
             <div className="mt-6 flex gap-6 font-sans text-[10px] font-bold uppercase tracking-widest text-white">
-              <a href="https://instagram.com" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">Instagram</a>
-              <a href="https://wa.me/1234567890" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a href="https://www.instagram.com/saaf.couture/" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">Instagram</a>
+              <a href="https://wa.me/+916235114104" className="transition-opacity hover:opacity-70" target="_blank" rel="noopener noreferrer">WhatsApp</a>
             </div>
           </div>
 

@@ -16,7 +16,7 @@ export default function ReturnsPage() {
 
   const handleWhatsAppReturn = () => {
     const msg = `*RETURN REQUEST | SAAF COUTURE*%0A%0AOrder Number: ${orderNumber || "[Order #]"}%0AReason for return: `;
-    window.open(`https://wa.me/9778461263?text=${msg}`, "_blank");
+    window.open(`https://wa.me/+916235114104?text=${msg}`, "_blank");
   };
 
   return (

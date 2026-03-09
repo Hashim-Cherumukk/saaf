@@ -49,7 +49,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   );
 
   const handleWhatsAppCheckout = () => {
-    const phoneNumber = "9778461263";
+    const phoneNumber = "+916235114104";
 
     // FIX 3: Using %0A for perfectly formatted WhatsApp line breaks
     let message = `*NEW ORDER | SAAF COUTURE*%0A%0A`;
