@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation"; // 1. IMPORT ROUTER
 import { Search, Heart, ShoppingBag, Menu, ChevronDown, X } from "lucide-react";
 import { useCartStore } from "@/store/useCartStore";
 import { useWishlistStore } from "@/store/useWishlistStore";
@@ -12,6 +13,7 @@ import MobileMenu from "./MobileMenu";
 import MegaMenu from "./MegaMenu";
 
 export default function Navbar() {
+  const router = useRouter(); // 2. INITIALIZE ROUTER
   const [mounted, setMounted] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -21,6 +23,9 @@ export default function Navbar() {
 
   const [desktopSearchOpen, setDesktopSearchOpen] = useState(false);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+  
+  // 3. ADD SEARCH STATE
+  const [searchQuery, setSearchQuery] = useState("");
 
   // Live Zustand Subscriptions
   const cart = useCartStore((state) => state.cart);
@@ -33,6 +38,16 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // 4. ADD SEARCH HANDLER FUNCTION
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/shop?search=${encodeURIComponent(searchQuery)}`);
+      setDesktopSearchOpen(false);
+      setMobileSearchOpen(false);
+    }
+  };
 
   return (
     <>
@@ -69,7 +84,7 @@ export default function Navbar() {
                 className={`transition-all duration-500 ${
                   isScrolled ? "h-[45px]" : "h-[60px]"
                 } w-auto object-contain`}
-                priority // This now works instantly because it's not waiting for 'mounted'
+                priority
               />
             </Link>
           </div>
@@ -140,17 +155,22 @@ export default function Navbar() {
 
             {/* Desktop Search */}
             <div className="relative hidden md:flex items-center">
-
+              {/* 5. ADD FORM WRAPPER FOR DESKTOP */}
+              <form onSubmit={handleSearchSubmit}>
                 <input
-                type="text"
-                placeholder="Search products..."
-                className={`transition-all duration-300 ease-out ${
-                  desktopSearchOpen ? "w-56 opacity-100 px-4 pr-10" : "w-0 opacity-0 px-0"
-                } h-9 rounded-full border border-black/10 outline-none text-sm`}
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products..."
+                  className={`transition-all duration-300 ease-out ${
+                    desktopSearchOpen ? "w-56 opacity-100 px-4 pr-10" : "w-0 opacity-0 px-0"
+                  } h-9 rounded-full border border-black/10 outline-none text-sm bg-white`}
                 />
+              </form>
 
               {!desktopSearchOpen ? (
                 <button
+                  type="button"
                   onClick={() => setDesktopSearchOpen(true)}
                   className="ml-2 hover:scale-110 transition"
                 >
@@ -158,7 +178,11 @@ export default function Navbar() {
                   </button>
               ) : (
                 <button
-                  onClick={() => setDesktopSearchOpen(false)}
+                  type="button"
+                  onClick={() => {
+                    setDesktopSearchOpen(false);
+                    setSearchQuery("");
+                  }}
                   className="absolute right-2 hover:scale-110 transition"
                 >
                   <X size={16} strokeWidth={2} />
@@ -213,17 +237,24 @@ export default function Navbar() {
           <div className="md:hidden border-t bg-white px-4 py-3 animate-[fadeIn_.2s_ease]">
             <div className="flex items-center gap-3">
 
-              <div className="flex flex-1 items-center gap-2 rounded-full bg-gray-100 px-3 py-2">
+              {/* 6. ADD FORM WRAPPER FOR MOBILE */}
+              <form onSubmit={handleSearchSubmit} className="flex flex-1 items-center gap-2 rounded-full bg-gray-100 px-3 py-2">
                 <Search size={18} />
                 <input
                   type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Describe what you're looking for..."
                   className="flex-1 bg-transparent outline-none text-sm"
+                  autoFocus // Automatically focus input when mobile search opens
                 />
-              </div>
+              </form>
 
               <button
-                onClick={() => setMobileSearchOpen(false)}
+                onClick={() => {
+                  setMobileSearchOpen(false);
+                  setSearchQuery("");
+                }}
                 className="text-sm font-medium"
               >
                 Cancel

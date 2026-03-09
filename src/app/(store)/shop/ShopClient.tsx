@@ -1,23 +1,36 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation"; // 1. IMPORT THIS
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@prisma/client";
 
 export default function ShopClient({ products }: { products: Product[] }) {
-  // FIX 1: Changed "qamees" to "clothing" to match the database
+  const searchParams = useSearchParams();
+  // 2. GET THE SEARCH WORD FROM THE URL
+  const searchQuery = searchParams.get("search")?.toLowerCase() || ""; 
+
   const [activeFilter, setActiveFilter] = useState<"all" | "clothing" | "perfumes" | "others">("all");
 
-  const filteredProducts = products.filter(
-    (product) => activeFilter === "all" || product.category === activeFilter
-  );
+  // 3. UPDATE THE FILTER LOGIC
+  const filteredProducts = products.filter((product) => {
+    // Check if it matches the left sidebar category
+    const matchesCategory = activeFilter === "all" || product.category === activeFilter;
+    
+    // Check if the product name or description includes the typed word
+    const matchesSearch = product.name.toLowerCase().includes(searchQuery) || 
+                          (product.description?.toLowerCase().includes(searchQuery));
 
-  // Dynamic Title Logic
-  const pageTitle = 
-    activeFilter === "all" ? "All Products" : 
-    activeFilter === "clothing" ? "Qamees Collection" : // Still shows "Qamees" on screen!
-    activeFilter === "perfumes" ? "Signature Perfumes" :
-    "Others";
+    return matchesCategory && matchesSearch;
+  });
+
+  // Dynamic Title Logic (Overrides with Search word if one exists)
+  const pageTitle = searchQuery 
+    ? `Search: "${searchParams.get("search")}"`
+    : activeFilter === "all" ? "All Products" : 
+      activeFilter === "clothing" ? "Qamees Collection" : 
+      activeFilter === "perfumes" ? "Signature Perfumes" :
+      "Others";
 
   return (
     <main className="min-h-screen w-full bg-white pb-32 pt-6 md:pt-12">
@@ -37,7 +50,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
               
               <button
                 type="button"
-                onClick={() => setActiveFilter("all")}
+                onClick={() => { setActiveFilter("all"); /* Optional: clear search on click */ }}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
                   activeFilter === "all" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}
@@ -46,7 +59,6 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 <span className="hidden font-sans text-[9px] text-black/30 lg:block">[{products.length}]</span>
               </button>
 
-              {/* FIX 2: Updated button logic to use "clothing" */}
               <button
                 type="button"
                 onClick={() => setActiveFilter("clothing")}
@@ -94,7 +106,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
             {filteredProducts.length === 0 ? (
               <div className="flex h-[50vh] flex-col items-center justify-center border border-dashed border-black/10 text-center">
                 <p className="font-sans text-xs font-bold uppercase tracking-widest text-black/40">
-                  No products found in this category.
+                  No products found for this search.
                 </p>
               </div>
             ) : (
