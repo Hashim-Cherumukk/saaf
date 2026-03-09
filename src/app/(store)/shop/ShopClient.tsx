@@ -5,7 +5,8 @@ import ProductCard from "@/components/ProductCard";
 import type { Product } from "@prisma/client";
 
 export default function ShopClient({ products }: { products: Product[] }) {
-  const [activeFilter, setActiveFilter] = useState<"all" | "qamees" | "perfumes" | "others">("all");
+  // FIX 1: Changed "qamees" to "clothing" to match the database
+  const [activeFilter, setActiveFilter] = useState<"all" | "clothing" | "perfumes" | "others">("all");
 
   const filteredProducts = products.filter(
     (product) => activeFilter === "all" || product.category === activeFilter
@@ -14,7 +15,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
   // Dynamic Title Logic
   const pageTitle = 
     activeFilter === "all" ? "All Products" : 
-    activeFilter === "qamees" ? "Qamees Collection" : 
+    activeFilter === "clothing" ? "Qamees Collection" : // Still shows "Qamees" on screen!
     activeFilter === "perfumes" ? "Signature Perfumes" :
     "Others";
 
@@ -45,16 +46,17 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 <span className="hidden font-sans text-[9px] text-black/30 lg:block">[{products.length}]</span>
               </button>
 
+              {/* FIX 2: Updated button logic to use "clothing" */}
               <button
                 type="button"
-                onClick={() => setActiveFilter("qamees")}
+                onClick={() => setActiveFilter("clothing")}
                 className={`flex shrink-0 items-center justify-between font-sans text-xs font-bold uppercase tracking-widest transition-colors ${
-                  activeFilter === "qamees" ? "text-black" : "text-black/40 hover:text-black/70"
+                  activeFilter === "clothing" ? "text-black" : "text-black/40 hover:text-black/70"
                 }`}
               >
                 <span>Qamees</span>
                 <span className="hidden font-sans text-[9px] text-black/30 lg:block">
-                  [{products.filter(p => p.category === 'qamees').length}]
+                  [{products.filter(p => p.category === 'clothing').length}]
                 </span>
               </button>
 
