@@ -18,13 +18,13 @@ export default function Hero() {
 
         <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] bg-white">
           <Image
-            src="/hero.png"
+            src="/hero.webp"
             alt="SAAF Couture"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
             placeholder="blur"
-            blurDataURL="/hero.png"
+            blurDataURL="/hero.webp"
             className="object-cover object-center"
           />
         </div>
