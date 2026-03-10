@@ -19,7 +19,7 @@ export default function Hero() {
         <div className="relative w-full aspect-[4/3] sm:aspect-[3/2] bg-white">
           <Image
             src="/hero.webp"
-            alt="SAAF Couture"
+            alt="Saaf Couture premium qamees and luxury perfumes"
             fill
             priority
             sizes="(max-width: 768px) 100vw, 50vw"
@@ -104,7 +104,7 @@ export default function Hero() {
           <div className="relative h-full w-full">
             <Image
               src="/hero.webp"
-              alt="SAAF Couture"
+              alt="Saaf Couture premium qamees and luxury perfumes"
               fill
               priority
               sizes="(max-width: 768px) 100vw, 50vw"
