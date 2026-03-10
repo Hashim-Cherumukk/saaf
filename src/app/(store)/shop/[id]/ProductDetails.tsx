@@ -354,7 +354,7 @@ export default function ProductDetails({ product }: { product: Product }) {
                   <button
                     onClick={() => {
                       const message = `Hello, I saw that *${product.name}* is currently out of stock. Could you let me know when it will be available again?`;
-                      window.open(`https://wa.me/9778461263?text=${message}`, "_blank");
+                      window.open(`https://wa.me/916235114104?text=${message}`, "_blank");
                     }}
                     className="w-full flex items-center justify-center gap-2 border border-black h-14 font-sans text-[11px] font-bold uppercase tracking-[0.2em] text-black transition-colors hover:bg-black hover:text-white active:scale-[0.98]"
                   >
